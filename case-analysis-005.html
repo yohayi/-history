@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python数据分析流程 - 案例005</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .case-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .case-id {
+            display: inline-block;
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .case-title {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .case-meta {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .case-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .case-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .tag {
+            background-color: #ffec99;
+            color: #e67700;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .tag.python { background-color: #ffec99; color: #e67700; }
+        .tag.data { background-color: #d3f9d8; color: #2b8a3e; }
+        .tag.pandas { background-color: #e7f5ff; color: #1971c2; }
+        .tag.numpy { background-color: #e5dbff; color: #5f3dc4; }
+        .tag.visualization { background-color: #ffdeeb; color: #a61e4d; }
+        
+        .content-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .hint-box {
+            background-color: #fff3bf;
+            border-left: 4px solid #e67700;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+        
+        .hint-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #e67700;
+        }
+        
+        .hint-title i {
+            font-size: 1.2rem;
+        }
+        
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .code-comment { color: #6a9955; }
+        .code-keyword { color: #569cd6; }
+        .code-function { color: #dcdcaa; }
+        .code-string { color: #ce9178; }
+        .code-number { color: #b5cea8; }
+        .code-variable { color: #9cdcfe; }
+        .code-operator { color: #d4d4d4; }
+        .code-class { color: #4ec9b0; }
+        
+        .data-process-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .flow-step {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .flow-step:not(:last-child):after {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 70px;
+            width: 2px;
+            height: 40px;
+            background-color: #4dabf7;
+        }
+        
+        .step-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #4dabf7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 20px;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+        
+        .step-content {
+            flex: 1;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #4dabf7;
+        }
+        
+        .step-content h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .library-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-top: 4px solid #e67700;
+            transition: all 0.3s;
+        }
+        
+        .library-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .library-card h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .analysis-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .analysis-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .analysis-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .list-icon {
+            color: #e67700;
+            font-size: 1.2rem;
+            margin-top: 3px;
+        }
+        
+        .related-cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .related-case {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .related-case:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .related-case h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .interactive-demo {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .demo-tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        
+        .demo-tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .demo-tab.active {
+            color: #e67700;
+            border-bottom-color: #e67700;
+        }
+        
+        .demo-content {
+            display: none;
+        }
+        
+        .demo-content.active {
+            display: block;
+        }
+        
+        .demo-code {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .chart-container {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            height: 400px;
+            position: relative;
+        }
+        
+        .data-table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+        
+        .data-table th, .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .data-table th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .demo-btn {
+            padding: 10px 20px;
+            background-color: #4dabf7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .demo-btn:hover {
+            background-color: #1c7ed6;
+        }
+        
+        .demo-btn.secondary {
+            background-color: #e67700;
+        }
+        
+        .demo-btn.secondary:hover {
+            background-color: #d35400;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .case-title {
+                font-size: 1.8rem;
+            }
+            
+            .content-section {
+                padding: 20px;
+            }
+            
+            .related-cases {
+                grid-template-columns: 1fr;
+            }
+            
+            .library-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .flow-step {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .flow-step:not(:last-child):after {
+                left: 30px;
+                top: 140px;
+                height: 30px;
+            }
+            
+            .step-icon {
+                margin-bottom: 15px;
+            }
+            
+            .demo-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .demo-tab {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    返回主页面
+                </a>
+                <div>
+                    <h1>历史记录分析系统</h1>
+                    <p style="opacity: 0.85; margin-top: 5px;">案例详细分析</p>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="case-header">
+            <span class="case-id">REC005</span>
+            <h1 class="case-title">Python数据分析流程</h1>
+            <div class="case-meta">
+                <div class="case-meta-item">
+                    <i class="far fa-calendar"></i>
+                    <span>创建日期: 2023-09-20</span>
+                </div>
+                <div class="case-meta-item">
+                    <i class="fas fa-tags"></i>
+                    <span>标签:</span>
+                </div>
+            </div>
+            <div class="case-tags">
+                <span class="tag python">python</span>
+                <span class="tag data">数据分析</span>
+                <span class="tag pandas">pandas</span>
+                <span class="tag numpy">numpy</span>
+                <span class="tag visualization">可视化</span>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <div class="hint-box">
+                <div class="hint-title">
+                    <i class="fas fa-lightbulb"></i>
+                    <h3>案例暗示分析</h3>
+                </div>
+                <p>这个案例展示了Python数据分析的完整流程，从数据收集、清洗、分析到可视化的全过程。分析发现，许多数据分析项目失败的原因在于缺乏系统化的流程和合适工具的选择。本案例提供了基于Python生态系统的标准化数据分析流程，并针对常见问题提供了解决方案。</p>
+            </div>
+            
+            <h2 class="section-title">数据分析标准化流程</h2>
+            
+            <div class="data-process-flow">
+                <div class="flow-step">
+                    <div class="step-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>1. 数据收集与获取</h4>
+                        <p>从各种来源获取数据：数据库、API、CSV/Excel文件、网络爬虫等。关键考虑数据质量、完整性和获取效率。</p>
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-icon">
+                        <i class="fas fa-shower"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>2. 数据清洗与预处理</h4>
+                        <p>处理缺失值、异常值、重复数据，进行数据类型转换和数据标准化。这是数据分析中最耗时但最重要的步骤。</p>
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>3. 探索性数据分析 (EDA)</h4>
+                        <p>通过统计分析和可视化初步了解数据特征，发现模式、异常和关系，为后续分析提供方向。</p>
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>4. 数据分析与建模</h4>
+                        <p>应用统计方法、机器学习算法进行深入分析，建立预测模型或分类模型，提取有价值的信息。</p>
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>5. 结果可视化与报告</h4>
+                        <p>将分析结果通过图表、仪表板等形式可视化，制作分析报告，向决策者传达洞察和结论。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">Python数据分析核心库</h2>
+            
+            <div class="library-grid">
+                <div class="library-card">
+                    <h4><i class="fab fa-python"></i> Pandas</h4>
+                    <p>数据处理和分析的核心库，提供DataFrame数据结构，支持数据清洗、转换、合并等操作。</p>
+                    <div style="margin-top: 10px;">
+                        <span style="font-size: 0.8rem; color: #666;">主要用途：数据操作、清洗、分析</span>
+                    </div>
+                </div>
+                
+                <div class="library-card">
+                    <h4><i class="fas fa-calculator"></i> NumPy</h4>
+                    <p>科学计算基础库，提供多维数组对象和数学函数，是许多其他科学计算库的基础。</p>
+                    <div style="margin-top: 10px;">
+                        <span style="font-size: 0.8rem; color: #666;">主要用途：数值计算、数组操作</span>
+                    </div>
+                </div>
+                
+                <div class="library-card">
+                    <h4><i class="fas fa-chart-bar"></i> Matplotlib</h4>
+                    <p>Python基础绘图库，提供广泛的2D绘图功能，可创建高质量的静态图表。</p>
+                    <div style="margin-top: 10px;">
+                        <span style="font-size: 0.8rem; color: #666;">主要用途：数据可视化、图表制作</span>
+                    </div>
+                </div>
+                
+                <div class="library-card">
+                    <h4><i class="fas fa-chart-area"></i> Seaborn</h4>
+                    <p>基于Matplotlib的高级统计图表库，提供更美观的默认样式和更简单的复杂图表创建方法。</p>
+                    <div style="margin-top: 10px;">
+                        <span style="font-size: 0.8rem; color: #666;">主要用途：统计可视化、美观图表</span>
+                    </div>
+                </div>
+                
+                <div class="library-card">
+                    <h4><i class="fas fa-brain"></i> Scikit-learn</h4>
+                    <p>机器学习库，提供各种分类、回归、聚类算法以及数据预处理和模型评估工具。</p>
+                    <div style="margin-top: 10px;">
+                        <span style="font-size: 0.8rem; color: #666;">主要用途：机器学习、模型构建</span>
+                    </div>
+                </div>
+                
+                <div class="library-card">
+                    <h4><i class="fas fa-project-diagram"></i> SciPy</h4>
+                    <p>科学计算库，基于NumPy，提供更高级的数学算法和函数，用于优化、统计、信号处理等。</p>
+                    <div style="margin-top: 10px;">
+                        <span style="font-size: 0.8rem; color: #666;">主要用途：科学计算、高级数学</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">数据分析代码示例</h2>
+            
+            <div class="interactive-demo">
+                <div class="demo-tabs">
+                    <button class="demo-tab active" data-target="cleaning-tab">数据清洗</button>
+                    <button class="demo-tab" data-target="analysis-tab">数据分析</button>
+                    <button class="demo-tab" data-target="visualization-tab">数据可视化</button>
+                </div>
+                
+                <div id="cleaning-tab" class="demo-content active">
+                    <p>数据清洗是数据分析的关键步骤，以下是常见的数据清洗操作：</p>
+                    
+                    <div class="demo-code">
+<span class="code-comment"># 导入必要的库</span><br>
+<span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd<br>
+<span class="code-keyword">import</span> numpy <span class="code-keyword">as</span> np<br><br>
+
+<span class="code-comment"># 读取数据</span><br>
+df = pd.read_csv(<span class="code-string">'sales_data.csv'</span>)<br>
+<span class="code-function">print</span>(<span class="code-string">"原始数据形状:"</span>, df.shape)<br>
+<span class="code-function">print</span>(<span class="code-string">"\\n前5行数据:"</span>)<br>
+<span class="code-function">print</span>(df.head())<br><br>
+
+<span class="code-comment"># 检查缺失值</span><br>
+<span class="code-function">print</span>(<span class="code-string">"\\n缺失值统计:"</span>)<br>
+<span class="code-function">print</span>(df.isnull().sum())<br><br>
+
+<span class="code-comment"># 处理缺失值</span><br>
+<span class="code-comment"># 数值列用中位数填充</span><br>
+<span class="code-keyword">for</span> col <span class="code-keyword">in</span> df.select_dtypes(include=[np.number]).columns:<br>
+&nbsp;&nbsp;<span class="code-keyword">if</span> df[col].isnull().sum() > <span class="code-number">0</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;df[col].fillna(df[col].median(), inplace=<span class="code-keyword">True</span>)<br><br>
+
+<span class="code-comment"># 分类列用众数填充</span><br>
+<span class="code-keyword">for</span> col <span class="code-keyword">in</span> df.select_dtypes(include=[<span class="code-string">'object'</span>]).columns:<br>
+&nbsp;&nbsp;<span class="code-keyword">if</span> df[col].isnull().sum() > <span class="code-number">0</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;df[col].fillna(df[col].mode()[<span class="code-number">0</span>], inplace=<span class="code-keyword">True</span>)<br><br>
+
+<span class="code-comment"># 删除重复行</span><br>
+df.drop_duplicates(inplace=<span class="code-keyword">True</span>)<br>
+<span class="code-function">print</span>(<span class="code-string">"\\n清洗后数据形状:"</span>, df.shape)<br><br>
+
+<span class="code-comment"># 数据类型转换</span><br>
+df[<span class="code-string">'date'</span>] = pd.to_datetime(df[<span class="code-string">'date'</span>])<br>
+df[<span class="code-string">'price'</span>] = pd.to_numeric(df[<span class="code-string">'price'</span>], errors=<span class="code-string">'coerce'</span>)<br><br>
+
+<span class="code-comment"># 处理异常值（使用IQR方法）</span><br>
+<span class="code-keyword">def</span> <span class="code-function">remove_outliers_iqr</span>(df, column):<br>
+&nbsp;&nbsp;Q1 = df[column].quantile(<span class="code-number">0.25</span>)<br>
+&nbsp;&nbsp;Q3 = df[column].quantile(<span class="code-number">0.75</span>)<br>
+&nbsp;&nbsp;IQR = Q3 - Q1<br>
+&nbsp;&nbsp;lower_bound = Q1 - <span class="code-number">1.5</span> * IQR<br>
+&nbsp;&nbsp;upper_bound = Q3 + <span class="code-number">1.5</span> * IQR<br>
+&nbsp;&nbsp;<span class="code-keyword">return</span> df[(df[column] >= lower_bound) & (df[column] <= upper_bound)]<br><br>
+
+df_clean = remove_outliers_iqr(df, <span class="code-string">'sales_amount'</span>)<br>
+<span class="code-function">print</span>(<span class="code-string">"\\n异常值处理后数据形状:"</span>, df_clean.shape)
+                    </div>
+                </div>
+                
+                <div id="analysis-tab" class="demo-content">
+                    <p>数据分析阶段，我们使用Pandas进行数据探索和统计计算：</p>
+                    
+                    <div class="demo-code">
+<span class="code-comment"># 数据探索性分析</span><br>
+<span class="code-comment"># 基本统计信息</span><br>
+<span class="code-function">print</span>(<span class="code-string">"基本统计信息:"</span>)<br>
+<span class="code-function">print</span>(df.describe())<br><br>
+
+<span class="code-comment"># 分类变量统计</span><br>
+<span class="code-function">print</span>(<span class="code-string">"\\n分类变量分布:"</span>)<br>
+<span class="code-keyword">for</span> col <span class="code-keyword">in</span> df.select_dtypes(include=[<span class="code-string">'object'</span>]).columns:<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(<span class="code-string">f"\\n{col}分布:"</span>)<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(df[col].value_counts().head())<br><br>
+
+<span class="code-comment"># 相关性分析</span><br>
+<span class="code-function">print</span>(<span class="code-string">"\\n数值变量相关性矩阵:"</span>)<br>
+correlation_matrix = df.select_dtypes(include=[np.number]).corr()<br>
+<span class="code-function">print</span>(correlation_matrix)<br><br>
+
+<span class="code-comment"># 分组聚合分析</span><br>
+<span class="code-function">print</span>(<span class="code-string">"\\n按类别分组统计:"</span>)<br>
+grouped_stats = df.groupby(<span class="code-string">'category'</span>).agg({<br>
+&nbsp;&nbsp;<span class="code-string">'sales_amount'</span>: [<span class="code-string">'sum'</span>, <span class="code-string">'mean'</span>, <span class="code-string">'median'</span>, <span class="code-string">'count'</span>],<br>
+&nbsp;&nbsp;<span class="code-string">'price'</span>: [<span class="code-string">'mean'</span>, <span class="code-string">'std'</span>]<br>
+})<br>
+<span class="code-function">print</span>(grouped_stats)<br><br>
+
+<span class="code-comment"># 时间序列分析</span><br>
+<span class="code-keyword">if</span> <span class="code-string">'date'</span> <span class="code-keyword">in</span> df.columns:<br>
+&nbsp;&nbsp;df[<span class="code-string">'month'</span>] = df[<span class="code-string">'date'</span>].dt.to_period(<span class="code-string">'M'</span>)<br>
+&nbsp;&nbsp;monthly_sales = df.groupby(<span class="code-string">'month'</span>)[<span class="code-string">'sales_amount'</span>].sum()<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(<span class="code-string">"\\n月度销售趋势:"</span>)<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(monthly_sales)
+                    </div>
+                </div>
+                
+                <div id="visualization-tab" class="demo-content">
+                    <p>数据可视化帮助我们发现模式和趋势：</p>
+                    
+                    <div class="demo-code">
+<span class="code-comment"># 数据可视化</span><br>
+<span class="code-keyword">import</span> matplotlib.pyplot <span class="code-keyword">as</span> plt<br>
+<span class="code-keyword">import</span> seaborn <span class="code-keyword">as</span> sns<br>
+<span class="code-keyword">import</span> warnings<br>
+warnings.filterwarnings(<span class="code-string">'ignore'</span>)<br><br>
+
+<span class="code-comment"># 设置中文字体和样式</span><br>
+plt.rcParams[<span class="code-string">'font.sans-serif'</span>] = [<span class="code-string">'SimHei'</span>]<br>
+plt.rcParams[<span class="code-string">'axes.unicode_minus'</span>] = <span class="code-keyword">False</span><br>
+sns.set_style(<span class="code-string">'whitegrid'</span>)<br><br>
+
+<span class="code-comment"># 创建子图</span><br>
+fig, axes = plt.subplots(<span class="code-number">2</span>, <span class="code-number">2</span>, figsize=(<span class="code-number">14</span>, <span class="code-number">10</span>))<br><br>
+
+<span class="code-comment"># 1. 销售额分布直方图</span><br>
+axes[<span class="code-number">0</span>, <span class="code-number">0</span>].hist(df[<span class="code-string">'sales_amount'</span>], bins=<span class="code-number">30</span>, color=<span class="code-string">'skyblue'</span>, edgecolor=<span class="code-string">'black'</span>)<br>
+axes[<span class="code-number">0</span>, <span class="code-number">0</span>].set_title(<span class="code-string">'销售额分布'</span>)<br>
+axes[<span class="code-number">0</span>, <span class="code-number">0</span>].set_xlabel(<span class="code-string">'销售额'</span>)<br>
+axes[<span class="code-number">0</span>, <span class="code-number">0</span>].set_ylabel(<span class="code-string">'频数'</span>)<br><br>
+
+<span class="code-comment"># 2. 类别销售总额条形图</span><br>
+category_sales = df.groupby(<span class="code-string">'category'</span>)[<span class="code-string">'sales_amount'</span>].sum().sort_values(ascending=<span class="code-keyword">False</span>)<br>
+axes[<span class="code-number">0</span>, <span class="code-number">1</span>].bar(category_sales.index, category_sales.values, color=<span class="code-string">'lightcoral'</span>)<br>
+axes[<span class="code-number">0</span>, <span class="code-number">1</span>].set_title(<span class="code-string">'各类别销售总额'</span>)<br>
+axes[<span class="code-number">0</span>, <span class="code-number">1</span>].set_xlabel(<span class="code-string">'产品类别'</span>)<br>
+axes[<span class="code-number">0</span>, <span class="code-number">1</span>].set_ylabel(<span class="code-string">'销售总额'</span>)<br>
+axes[<span class="code-number">0</span>, <span class="code-number">1</span>].tick_params(axis=<span class="code-string">'x'</span>, rotation=<span class="code-number">45</span>)<br><br>
+
+<span class="code-comment"># 3. 价格与销售额散点图</span><br>
+axes[<span class="code-number">1</span>, <span class="code-number">0</span>].scatter(df[<span class="code-string">'price'</span>], df[<span class="code-string">'sales_amount'</span>], alpha=<span class="code-number">0.6</span>, color=<span class="code-string">'mediumseagreen'</span>)<br>
+axes[<span class="code-number">1</span>, <span class="code-number">0</span>].set_title(<span class="code-string">'价格与销售额关系'</span>)<br>
+axes[<span class="code-number">1</span>, <span class="code-number">0</span>].set_xlabel(<span class="code-string">'价格'</span>)<br>
+axes[<span class="code-number">1</span>, <span class="code-number">0</span>].set_ylabel(<span class="code-string">'销售额'</span>)<br><br>
+
+<span class="code-comment"># 4. 相关性热图</span><br>
+numeric_df = df.select_dtypes(include=[np.number])<br>
+corr_matrix = numeric_df.corr()<br>
+sns.heatmap(corr_matrix, annot=<span class="code-keyword">True</span>, fmt=<span class="code-string">'.2f'</span>, cmap=<span class="code-string">'coolwarm'</span>, ax=axes[<span class="code-number">1</span>, <span class="code-number">1</span>])<br>
+axes[<span class="code-number">1</span>, <span class="code-number">1</span>].set_title(<span class="code-string">'变量相关性热图'</span>)<br><br>
+
+plt.tight_layout()<br>
+plt.show()
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">交互演示：数据分析流程</h2>
+            
+            <div class="interactive-demo">
+                <div class="demo-controls">
+                    <button class="demo-btn" id="loadDataBtn">加载模拟数据</button>
+                    <button class="demo-btn" id="cleanDataBtn">清洗数据</button>
+                    <button class="demo-btn" id="analyzeDataBtn">分析数据</button>
+                    <button class="demo-btn secondary" id="resetBtn">重置</button>
+                </div>
+                
+                <div class="data-table-container">
+                    <table class="data-table" id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>产品</th>
+                                <th>类别</th>
+                                <th>价格</th>
+                                <th>数量</th>
+                                <th>销售额</th>
+                                <th>日期</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 40px;">
+                                    <i class="fas fa-database" style="font-size: 2rem; color: #ccc; margin-bottom: 10px; display: block;"></i>
+                                    <p>点击"加载模拟数据"按钮加载数据</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="dataChart"></canvas>
+                </div>
+                
+                <div id="analysisResults" style="display: none;">
+                    <h4 style="margin-bottom: 15px; color: #2c3e50;">分析结果摘要</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="background-color: #e7f5ff; padding: 15px; border-radius: 6px;">
+                            <div style="font-size: 0.9rem; color: #666;">总销售额</div>
+                            <div style="font-size: 1.5rem; font-weight: 600; color: #1971c2;" id="totalSales">¥0</div>
+                        </div>
+                        <div style="background-color: #d3f9d8; padding: 15px; border-radius: 6px;">
+                            <div style="font-size: 0.9rem; color: #666;">平均价格</div>
+                            <div style="font-size: 1.5rem; font-weight: 600; color: #2b8a3e;" id="avgPrice">¥0</div>
+                        </div>
+                        <div style="background-color: #fff3bf; padding: 15px; border-radius: 6px;">
+                            <div style="font-size: 0.9rem; color: #666;">产品数量</div>
+                            <div style="font-size: 1.5rem; font-weight: 600; color: #e67700;" id="productCount">0</div>
+                        </div>
+                        <div style="background-color: #ffdeeb; padding: 15px; border-radius: 6px;">
+                            <div style="font-size: 0.9rem; color: #666;">最畅销类别</div>
+                            <div style="font-size: 1.5rem; font-weight: 600; color: #a61e4d;" id="topCategory">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">数据分析最佳实践</h2>
+            
+            <ul class="analysis-list">
+                <li>
+                    <i class="fas fa-check-circle list-icon"></i>
+                    <div>
+                        <strong>数据质量优先</strong>：花60-80%的时间在数据清洗和准备上，确保数据质量是分析可靠性的基础。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle list-icon"></i>
+                    <div>
+                        <strong>逐步探索</strong>：从简单统计开始，逐步深入复杂分析，避免一开始就陷入复杂模型。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle list-icon"></i>
+                    <div>
+                        <strong>可视化验证</strong>：使用多种可视化方法验证分析结果，避免统计陷阱和错误结论。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle list-icon"></i>
+                    <div>
+                        <strong>文档化分析过程</strong>：使用Jupyter Notebook记录分析步骤、假设和决策，确保可重复性。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle list-icon"></i>
+                    <div>
+                        <strong>考虑业务背景</strong>：数据分析最终要服务于业务决策，确保分析结果有实际应用价值。
+                    </div>
+                </li>
+            </ul>
+            
+            <h3 style="margin: 30px 0 15px; color: #495057;">常见数据分析陷阱</h3>
+            <div style="padding: 20px; background-color: #ffe3e3; border-radius: 8px;">
+                <ol style="padding-left: 20px;">
+                    <li><strong>忽略数据偏见</strong>：数据可能包含选择偏见、抽样偏见等，影响分析结论的普适性。</li>
+                    <li><strong>相关性与因果混淆</strong>：两个变量相关不一定意味着因果关系，需要进一步实验验证。</li>
+                    <li><strong>过拟合模型</strong>：模型在训练数据上表现很好，但在新数据上表现差，缺乏泛化能力。</li>
+                    <li><strong>忽略异常值影响</strong>：异常值可能包含重要信息，不应盲目删除，需要仔细分析。</li>
+                    <li><strong>多重比较问题</strong>：进行多次统计检验时，偶然发现显著结果的概率增加，需要校正。</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">数据科学工作流程工具</h2>
+            
+            <div style="margin: 25px 0;">
+                <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;">
+                    <i class="fas fa-book" style="color: #e67700; font-size: 1.5rem; margin-top: 5px;"></i>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">Jupyter Notebook / JupyterLab</h4>
+                        <p>交互式计算环境，支持代码、文本、可视化在同一文档中，是数据科学研究的标准工具。</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;">
+                    <i class="fas fa-code-branch" style="color: #e67700; font-size: 1.5rem; margin-top: 5px;"></i>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">Git / GitHub</h4>
+                        <p>版本控制系统，用于跟踪代码变更、协作开发和项目管理，确保分析过程的可重复性。</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;">
+                    <i class="fas fa-box" style="color: #e67700; font-size: 1.5rem; margin-top: 5px;"></i>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">虚拟环境 (venv / conda)</h4>
+                        <p>创建独立的Python环境，管理项目依赖，避免版本冲突，确保分析环境的稳定性。</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; align-items: flex-start; gap: 15px;">
+                    <i class="fas fa-tasks" style="color: #e67700; font-size: 1.5rem; margin-top: 5px;"></i>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">自动化脚本与Pipeline</h4>
+                        <p>将分析流程自动化，使用Airflow、Prefect等工具创建可重复的数据处理流水线。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">相关案例</h2>
+            <div class="related-cases">
+                <a href="case-analysis-004.html" class="related-case">
+                    <h4>PHP后端API接口设计</h4>
+                    <p>如何构建数据API供分析系统使用</p>
+                </a>
+                <a href="case-analysis-006.html" class="related-case">
+                    <h4>前端性能优化策略</h4>
+                    <p>数据分析结果的前端展示优化</p>
+                </a>
+                <a href="index.html" class="related-case">
+                    <h4>查看所有案例</h4>
+                    <p>返回主页面浏览完整案例列表</p>
+                </a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>历史记录分析系统 &copy; 2023 | 案例编号: REC005</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 交互演示功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 选项卡功能
+            const tabs = document.querySelectorAll('.demo-tab');
+            const contents = document.querySelectorAll('.demo-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    
+                    // 移除所有active类
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    
+                    // 添加active类
+                    this.classList.add('active');
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+            
+            // 模拟数据
+            let rawData = [];
+            let cleanedData = [];
+            let analyzedData = [];
+            
+            // 产品类别
+            const categories = ['电子产品', '服装', '食品', '家居', '图书', '体育用品', '化妆品'];
+            
+            // 产品名称
+            const products = [
+                '智能手机', '笔记本电脑', '平板电脑', '智能手表', '无线耳机',
+                'T恤', '牛仔裤', '外套', '运动鞋', '连衣裙',
+                '巧克力', '咖啡', '饼干', '果汁', '坚果',
+                '沙发', '台灯', '床上用品', '厨具', '收纳箱',
+                '小说', '教科书', '杂志', '漫画', '儿童图书',
+                '篮球', '跑步机', '瑜伽垫', '泳衣', '登山包',
+                '口红', '粉底液', '面膜', '香水', '护肤品'
+            ];
+            
+            // 生成模拟数据
+            function generateMockData(count = 50) {
+                const data = [];
+                const startDate = new Date(2023, 0, 1);
+                const endDate = new Date(2023, 8, 30);
+                
+                for (let i = 1; i <= count; i++) {
+                    const category = categories[Math.floor(Math.random() * categories.length)];
+                    const product = products[Math.floor(Math.random() * products.length)];
+                    const price = Math.round((Math.random() * 500 + 10) * 100) / 100; // 10-510元
+                    const quantity = Math.floor(Math.random() * 20) + 1; // 1-20件
+                    const salesAmount = Math.round(price * quantity * 100) / 100;
+                    
+                    // 随机日期
+                    const randomDate = new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
+                    const dateStr = randomDate.toISOString().split('T')[0];
+                    
+                    // 随机添加一些缺失值和异常值
+                    const hasMissing = Math.random() < 0.1; // 10%的概率有缺失值
+                    const hasOutlier = Math.random() < 0.05; // 5%的概率有异常值
+                    
+                    data.push({
+                        id: i,
+                        product: hasMissing && Math.random() < 0.5 ? null : product,
+                        category: hasMissing && Math.random() < 0.5 ? null : category,
+                        price: hasOutlier && Math.random() < 0.5 ? price * 10 : price,
+                        quantity: hasOutlier && Math.random() < 0.5 ? quantity * 10 : quantity,
+                        salesAmount: hasOutlier && Math.random() < 0.5 ? salesAmount * 10 : salesAmount,
+                        date: dateStr
+                    });
+                }
+                
+                return data;
+            }
+            
+            // 清洗数据
+            function cleanData(data) {
+                // 深拷贝数据
+                const cleaned = JSON.parse(JSON.stringify(data));
+                
+                // 处理缺失值
+                cleaned.forEach(item => {
+                    if (!item.product) {
+                        item.product = '未知产品';
+                    }
+                    if (!item.category) {
+                        item.category = '其他';
+                    }
+                });
+                
+                // 计算价格中位数，用于处理异常值
+                const prices = cleaned.map(item => item.price).filter(price => price);
+                const sortedPrices = prices.sort((a, b) => a - b);
+                const medianPrice = sortedPrices[Math.floor(sortedPrices.length / 2)];
+                
+                // 处理异常值（简单方法：使用中位数替换极端值）
+                cleaned.forEach(item => {
+                    if (item.price > medianPrice * 5) {
+                        item.price = medianPrice;
+                        item.salesAmount = item.price * item.quantity;
+                    }
+                    if (item.quantity > 100) {
+                        item.quantity = Math.floor(Math.random() * 20) + 1;
+                        item.salesAmount = item.price * item.quantity;
+                    }
+                });
+                
+                return cleaned;
+            }
+            
+            // 分析数据
+            function analyzeData(data) {
+                if (data.length === 0) return {};
+                
+                // 总销售额
+                const totalSales = data.reduce((sum, item) => sum + item.salesAmount, 0);
+                
+                // 平均价格
+                const avgPrice = data.reduce((sum, item) => sum + item.price, 0) / data.length;
+                
+                // 产品数量
+                const productCount = data.length;
+                
+                // 最畅销类别
+                const categorySales = {};
+                data.forEach(item => {
+                    if (!categorySales[item.category]) {
+                        categorySales[item.category] = 0;
+                    }
+                    categorySales[item.category] += item.salesAmount;
+                });
+                
+                let topCategory = '';
+                let maxSales = 0;
+                for (const category in categorySales) {
+                    if (categorySales[category] > maxSales) {
+                        maxSales = categorySales[category];
+                        topCategory = category;
+                    }
+                }
+                
+                // 按类别统计销售额
+                const categoryData = Object.keys(categorySales).map(category => ({
+                    category,
+                    sales: categorySales[category]
+                })).sort((a, b) => b.sales - a.sales);
+                
+                return {
+                    totalSales,
+                    avgPrice,
+                    productCount,
+                    topCategory,
+                    categoryData
+                };
+            }
+            
+            // 渲染表格
+            function renderTable(data, containerId) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                
+                if (data.length === 0) {
+                    container.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px;">
+                                <i class="fas fa-database" style="font-size: 2rem; color: #ccc; margin-bottom: 10px; display: block;"></i>
+                                <p>没有数据</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                // 只显示前10行
+                const displayData = data.slice(0, 10);
+                
+                displayData.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.product || '<span style="color: #c92a2a;">(缺失)</span>'}</td>
+                        <td>${item.category || '<span style="color: #c92a2a;">(缺失)</span>'}</td>
+                        <td>¥${item.price.toFixed(2)}</td>
+                        <td>${item.quantity}</td>
+                        <td>¥${item.salesAmount.toFixed(2)}</td>
+                        <td>${item.date}</td>
+                    `;
+                    container.appendChild(row);
+                });
+                
+                if (data.length > 10) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td colspan="7" style="text-align: center; padding: 15px; color: #666;">
+                            显示前10条记录，共${data.length}条记录
+                        </td>
+                    `;
+                    container.appendChild(row);
+                }
+            }
+            
+            // 渲染图表
+            let chartInstance = null;
+            function renderChart(categoryData) {
+                const ctx = document.getElementById('dataChart').getContext('2d');
+                
+                // 销毁之前的图表
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
+                
+                // 准备图表数据
+                const labels = categoryData.map(item => item.category);
+                const data = categoryData.map(item => item.sales);
+                const backgroundColors = [
+                    '#4dabf7', '#1c7ed6', '#1971c2', '#1864ab',
+                    '#e67700', '#d35400', '#c92a2a', '#a61e4d',
+                    '#5f3dc4', '#2b8a3e', '#2b8a3e'
+                ];
+                
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '销售额 (¥)',
+                            data: data,
+                            backgroundColor: backgroundColors.slice(0, labels.length),
+                            borderColor: backgroundColors.slice(0, labels.length).map(color => color.replace('0.8', '1')),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '¥' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `销售额: ¥${context.parsed.y.toLocaleString()}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 更新分析结果
+            function updateAnalysisResults(results) {
+                document.getElementById('totalSales').textContent = '¥' + results.totalSales.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                document.getElementById('avgPrice').textContent = '¥' + results.avgPrice.toFixed(2);
+                document.getElementById('productCount').textContent = results.productCount;
+                document.getElementById('topCategory').textContent = results.topCategory;
+                
+                // 显示分析结果区域
+                document.getElementById('analysisResults').style.display = 'block';
+            }
+            
+            // 按钮事件处理
+            document.getElementById('loadDataBtn').addEventListener('click', function() {
+                rawData = generateMockData(50);
+                cleanedData = [];
+                analyzedData = [];
+                
+                renderTable(rawData, 'tableBody');
+                
+                // 重置图表
+                if (chartInstance) {
+                    chartInstance.destroy();
+                    chartInstance = null;
+                }
+                document.getElementById('analysisResults').style.display = 'none';
+                
+                // 更新按钮状态
+                this.disabled = true;
+                document.getElementById('cleanDataBtn').disabled = false;
+                document.getElementById('analyzeDataBtn').disabled = true;
+            });
+            
+            document.getElementById('cleanDataBtn').addEventListener('click', function() {
+                if (rawData.length === 0) return;
+                
+                cleanedData = cleanData(rawData);
+                analyzedData = [];
+                
+                renderTable(cleanedData, 'tableBody');
+                
+                // 重置图表
+                if (chartInstance) {
+                    chartInstance.destroy();
+                    chartInstance = null;
+                }
+                document.getElementById('analysisResults').style.display = 'none';
+                
+                // 更新按钮状态
+                document.getElementById('analyzeDataBtn').disabled = false;
+            });
+            
+            document.getElementById('analyzeDataBtn').addEventListener('click', function() {
+                if (cleanedData.length === 0) return;
+                
+                const results = analyzeData(cleanedData);
+                analyzedData = results;
+                
+                renderTable(cleanedData, 'tableBody');
+                renderChart(results.categoryData);
+                updateAnalysisResults(results);
+                
+                // 更新按钮状态
+                this.disabled = true;
+            });
+            
+            document.getElementById('resetBtn').addEventListener('click', function() {
+                rawData = [];
+                cleanedData = [];
+                analyzedData = [];
+                
+                renderTable([], 'tableBody');
+                
+                // 重置图表
+                if (chartInstance) {
+                    chartInstance.destroy();
+                    chartInstance = null;
+                }
+                document.getElementById('analysisResults').style.display = 'none';
+                
+                // 重置按钮状态
+                document.getElementById('loadDataBtn').disabled = false;
+                document.getElementById('cleanDataBtn').disabled = true;
+                document.getElementById('analyzeDataBtn').disabled = true;
+            });
+            
+            // 初始化按钮状态
+            document.getElementById('cleanDataBtn').disabled = true;
+            document.getElementById('analyzeDataBtn').disabled = true;
+            
+            console.log('案例页面加载完成: Python数据分析流程');
+        });
+    </script>
+</body>
+</html>
