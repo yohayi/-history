@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端性能优化策略 - 案例006</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .case-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .case-id {
+            display: inline-block;
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .case-title {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .case-meta {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .case-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .case-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .tag {
+            background-color: #ffe3e3;
+            color: #c92a2a;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .tag.js { background-color: #ffe3e3; color: #c92a2a; }
+        .tag.performance { background-color: #fff3bf; color: #e67700; }
+        .tag.optimization { background-color: #d3f9d8; color: #2b8a3e; }
+        .tag.loading { background-color: #e7f5ff; color: #1971c2; }
+        .tag.cache { background-color: #e5dbff; color: #5f3dc4; }
+        
+        .content-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .hint-box {
+            background-color: #ffe3e3;
+            border-left: 4px solid #c92a2a;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+        
+        .hint-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #c92a2a;
+        }
+        
+        .hint-title i {
+            font-size: 1.2rem;
+        }
+        
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .code-comment { color: #6a9955; }
+        .code-keyword { color: #569cd6; }
+        .code-function { color: #dcdcaa; }
+        .code-string { color: #ce9178; }
+        .code-number { color: #b5cea8; }
+        .code-variable { color: #9cdcfe; }
+        .code-operator { color: #d4d4d4; }
+        
+        .optimization-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .metric-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-top: 4px solid #1971c2;
+            transition: all 0.3s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .metric-card h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1971c2;
+            margin-bottom: 5px;
+        }
+        
+        .performance-impact {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .impact-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .impact-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #e7f5ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1971c2;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .impact-content h4 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .analysis-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .analysis-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .analysis-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .list-icon {
+            color: #c92a2a;
+            font-size: 1.2rem;
+            margin-top: 3px;
+        }
+        
+        .related-cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .related-case {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .related-case:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .related-case h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .interactive-demo {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .demo-tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        
+        .demo-tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .demo-tab.active {
+            color: #c92a2a;
+            border-bottom-color: #c92a2a;
+        }
+        
+        .demo-content {
+            display: none;
+        }
+        
+        .demo-content.active {
+            display: block;
+        }
+        
+        .demo-code {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .demo-preview {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 200px;
+        }
+        
+        .demo-preview h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .performance-chart-container {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            height: 400px;
+            position: relative;
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .demo-btn {
+            padding: 10px 20px;
+            background-color: #4dabf7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .demo-btn:hover {
+            background-color: #1c7ed6;
+        }
+        
+        .demo-btn.performance {
+            background-color: #c92a2a;
+        }
+        
+        .demo-btn.performance:hover {
+            background-color: #a61e4d;
+        }
+        
+        .demo-btn.optimized {
+            background-color: #2b8a3e;
+        }
+        
+        .demo-btn.optimized:hover {
+            background-color: #2b8a3e;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .comparison-table th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .comparison-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .performance-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-good { background-color: #d3f9d8; color: #2b8a3e; }
+        .badge-medium { background-color: #fff3bf; color: #e67700; }
+        .badge-bad { background-color: #ffe3e3; color: #c92a2a; }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .case-title {
+                font-size: 1.8rem;
+            }
+            
+            .content-section {
+                padding: 20px;
+            }
+            
+            .related-cases {
+                grid-template-columns: 1fr;
+            }
+            
+            .optimization-metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .performance-impact {
+                grid-template-columns: 1fr;
+            }
+            
+            .demo-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .demo-tab {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+            }
+            
+            .performance-chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    返回主页面
+                </a>
+                <div>
+                    <h1>历史记录分析系统</h1>
+                    <p style="opacity: 0.85; margin-top: 5px;">案例详细分析</p>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="case-header">
+            <span class="case-id">REC006</span>
+            <h1 class="case-title">前端性能优化策略</h1>
+            <div class="case-meta">
+                <div class="case-meta-item">
+                    <i class="far fa-calendar"></i>
+                    <span>创建日期: 2023-09-15</span>
+                </div>
+                <div class="case-meta-item">
+                    <i class="fas fa-tags"></i>
+                    <span>标签:</span>
+                </div>
+            </div>
+            <div class="case-tags">
+                <span class="tag js">javascript</span>
+                <span class="tag performance">性能</span>
+                <span class="tag optimization">优化</span>
+                <span class="tag loading">加载</span>
+                <span class="tag cache">缓存</span>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <div class="hint-box">
+                <div class="hint-title">
+                    <i class="fas fa-lightbulb"></i>
+                    <h3>案例暗示分析</h3>
+                </div>
+                <p>这个案例展示了前端性能优化的关键策略和技术。分析发现，许多Web应用存在严重的性能问题，导致用户体验下降、转化率降低和SEO排名受影响。通过实施系统化的性能优化策略，可以将页面加载时间减少40-60%，用户交互响应速度提升50%以上，并显著改善核心Web指标。</p>
+            </div>
+            
+            <h2 class="section-title">关键性能指标与优化目标</h2>
+            
+            <div class="optimization-metrics">
+                <div class="metric-card">
+                    <h4><i class="fas fa-tachometer-alt"></i> LCP (最大内容绘制)</h4>
+                    <div class="metric-value">&lt; 2.5s</div>
+                    <p>页面主要内容加载完成的时间，目标在2.5秒内</p>
+                </div>
+                
+                <div class="metric-card">
+                    <h4><i class="fas fa-mouse-pointer"></i> FID (首次输入延迟)</h4>
+                    <div class="metric-value">&lt; 100ms</div>
+                    <p>用户首次与页面交互到浏览器响应的延迟</p>
+                </div>
+                
+                <div class="metric-card">
+                    <h4><i class="fas fa-ruler-combined"></i> CLS (累计布局偏移)</h4>
+                    <div class="metric-value">&lt; 0.1</div>
+                    <p>页面加载期间意外布局偏移的程度</p>
+                </div>
+                
+                <div class="metric-card">
+                    <h4><i class="fas fa-download"></i> 首字节时间</h4>
+                    <div class="metric-value">&lt; 800ms</div>
+                    <p>从请求到收到第一个字节的时间</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">性能优化关键领域</h2>
+            
+            <div class="performance-impact">
+                <div class="impact-item">
+                    <div class="impact-icon">
+                        <i class="fas fa-file-image"></i>
+                    </div>
+                    <div class="impact-content">
+                        <h4>图片与媒体优化</h4>
+                        <p>图片占页面体积的60-70%，优化图片可以显著提升性能。使用WebP格式、响应式图片、懒加载等技术。</p>
+                    </div>
+                </div>
+                
+                <div class="impact-item">
+                    <div class="impact-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="impact-content">
+                        <h4>代码分割与懒加载</h4>
+                        <p>将代码分割成小块，按需加载，减少初始包大小。使用动态import()实现组件级懒加载。</p>
+                    </div>
+                </div>
+                
+                <div class="impact-item">
+                    <div class="impact-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="impact-content">
+                        <h4>服务器优化</h4>
+                        <p>启用HTTP/2、Gzip/Brotli压缩、CDN分发、缓存策略，减少网络传输时间和服务器响应时间。</p>
+                    </div>
+                </div>
+                
+                <div class="impact-item">
+                    <div class="impact-icon">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <div class="impact-content">
+                        <h4>渲染优化</h4>
+                        <p>优化CSS选择器、减少重绘重排、使用CSS硬件加速、避免布局抖动，提升页面渲染性能。</p>
+                    </div>
+                </div>
+                
+                <div class="impact-item">
+                    <div class="impact-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="impact-content">
+                        <h4>移动端优化</h4>
+                        <p>针对移动设备优化，减少JavaScript执行时间，优化触摸事件，考虑网络状况差异。</p>
+                    </div>
+                </div>
+                
+                <div class="impact-item">
+                    <div class="impact-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="impact-content">
+                        <h4>工具与监控</h4>
+                        <p>使用性能分析工具（Lighthouse、WebPageTest）和实时监控，持续优化性能。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">代码优化示例</h2>
+            
+            <div class="interactive-demo">
+                <div class="demo-tabs">
+                    <button class="demo-tab active" data-target="lazy-loading-tab">懒加载</button>
+                    <button class="demo-tab" data-target="code-splitting-tab">代码分割</button>
+                    <button class="demo-tab" data-target="image-optimization-tab">图片优化</button>
+                    <button class="demo-tab" data-target="rendering-tab">渲染优化</button>
+                </div>
+                
+                <div id="lazy-loading-tab" class="demo-content active">
+                    <p>懒加载可以延迟非关键资源的加载，提升初始页面加载速度：</p>
+                    
+                    <div class="demo-code">
+<span class="code-comment">// 传统图片加载（立即加载所有图片）</span><br>
+&lt;<span class="code-keyword">img</span> <span class="code-variable">src</span>=<span class="code-string">"image1.jpg"</span> <span class="code-variable">alt</span>=<span class="code-string">"图片1"</span>&gt;<br>
+&lt;<span class="code-keyword">img</span> <span class="code-variable">src</span>=<span class="code-string">"image2.jpg"</span> <span class="code-variable">alt</span>=<span class="code-string">"图片2"</span>&gt;<br>
+&lt;<span class="code-keyword">img</span> <span class="code-variable">src</span>=<span class="code-string">"image3.jpg"</span> <span class="code-variable">alt</span>=<span class="code-string">"图片3"</span>&gt;<br>
+&lt;<span class="code-keyword">img</span> <span class="code-variable">src</span>=<span class="code-string">"image4.jpg"</span> <span class="code-variable">alt</span>=<span class="code-string">"图片4"</span>&gt;<br><br>
+
+<span class="code-comment">// 懒加载图片（使用IntersectionObserver API）</span><br>
+&lt;<span class="code-keyword">img</span> <span class="code-variable">data-src</span>=<span class="code-string">"image1.jpg"</span> <span class="code-variable">class</span>=<span class="code-string">"lazy"</span> <span class="code-variable">alt</span>=<span class="code-string">"图片1"</span>&gt;<br>
+&lt;<span class="code-keyword">img</span> <span class="code-variable">data-src</span>=<span class="code-string">"image2.jpg"</span> <span class="code-variable">class</span>=<span class="code-string">"lazy"</span> <span class="code-variable">alt</span>=<span class="code-string">"图片2"</span>&gt;<br><br>
+
+&lt;<span class="code-keyword">script</span>&gt;<br>
+<span class="code-keyword">document</span>.<span class="code-function">addEventListener</span>(<span class="code-string">'DOMContentLoaded'</span>, <span class="code-keyword">function</span>() {<br>
+&nbsp;&nbsp;<span class="code-keyword">const</span> lazyImages = [].<span class="code-function">slice</span>.<span class="code-function">call</span>(<span class="code-keyword">document</span>.<span class="code-function">querySelectorAll</span>(<span class="code-string">'img.lazy'</span>));<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-keyword">if</span> (<span class="code-string">'IntersectionObserver'</span> <span class="code-keyword">in</span> window) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">const</span> imageObserver = <span class="code-keyword">new</span> <span class="code-function">IntersectionObserver</span>(<span class="code-keyword">function</span>(entries) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;entries.<span class="code-function">forEach</span>(<span class="code-keyword">function</span>(entry) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> (entry.isIntersecting) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">const</span> img = entry.target;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;img.src = img.dataset.src;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;img.<span class="code-function">classList</span>.<span class="code-function">remove</span>(<span class="code-string">'lazy'</span>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;imageObserver.<span class="code-function">unobserve</span>(img);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});<br>
+&nbsp;&nbsp;&nbsp;&nbsp;});<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;lazyImages.<span class="code-function">forEach</span>(<span class="code-keyword">function</span>(img) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;imageObserver.<span class="code-function">observe</span>(img);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;});<br>
+&nbsp;&nbsp;} <span class="code-keyword">else</span> {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">// 回退方案</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;lazyImages.<span class="code-function">forEach</span>(<span class="code-keyword">function</span>(img) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;img.src = img.dataset.src;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;});<br>
+&nbsp;&nbsp;}<br>
+});<br>
+&lt;/<span class="code-keyword">script</span>&gt;
+                    </div>
+                </div>
+                
+                <div id="code-splitting-tab" class="demo-content">
+                    <p>代码分割将代码拆分成多个包，然后按需加载：</p>
+                    
+                    <div class="demo-code">
+<span class="code-comment">// 传统方式：一次性加载所有组件</span><br>
+<span class="code-keyword">import</span> ComponentA <span class="code-keyword">from</span> <span class="code-string">'./components/ComponentA'</span>;<br>
+<span class="code-keyword">import</span> ComponentB <span class="code-keyword">from</span> <span class="code-string">'./components/ComponentB'</span>;<br>
+<span class="code-keyword">import</span> ComponentC <span class="code-keyword">from</span> <span class="code-string">'./components/ComponentC'</span>;<br>
+<span class="code-keyword">import</span> HeavyLibrary <span class="code-keyword">from</span> <span class="code-string">'heavy-library'</span>;<br><br>
+
+<span class="code-comment">// 优化：使用动态导入实现代码分割</span><br>
+<span class="code-comment">// 主应用文件只包含核心功能</span><br>
+<span class="code-keyword">const</span> loadComponentA = () =&gt; <span class="code-function">import</span>(<span class="code-string">'./components/ComponentA'</span>);<br>
+<span class="code-keyword">const</span> loadComponentB = () =&gt; <span class="code-function">import</span>(<span class="code-string">'./components/ComponentB'</span>);<br>
+<span class="code-keyword">const</span> loadHeavyLibrary = () =&gt; <span class="code-function">import</span>(<span class="code-string">'heavy-library'</span>);<br><br>
+
+<span class="code-comment">// 按需加载组件</span><br>
+<span class="code-keyword">document</span>.<span class="code-function">getElementById</span>(<span class="code-string">'btn-load-a'</span>).<span class="code-function">addEventListener</span>(<span class="code-string">'click'</span>, async () =&gt; {<br>
+&nbsp;&nbsp;<span class="code-keyword">const</span> module = <span class="code-keyword">await</span> <span class="code-function">loadComponentA</span>();<br>
+&nbsp;&nbsp;module.<span class="code-function">default</span>();<br>
+});<br><br>
+
+<span class="code-comment">// React中的代码分割示例</span><br>
+<span class="code-keyword">import</span> React, { Suspense, lazy } <span class="code-keyword">from</span> <span class="code-string">'react'</span>;<br>
+<span class="code-keyword">const</span> HeavyComponent = <span class="code-function">lazy</span>(() =&gt; <span class="code-function">import</span>(<span class="code-string">'./HeavyComponent'</span>));<br>
+<br>
+<span class="code-keyword">function</span> <span class="code-function">MyComponent</span>() {<br>
+&nbsp;&nbsp;<span class="code-keyword">return</span> (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">&lt;!-- 核心内容立即渲染 --&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Suspense fallback={&lt;div&gt;加载中...&lt;/div&gt;}&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;HeavyComponent /&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/Suspense&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;<br>
+&nbsp;&nbsp;);<br>
+}
+                    </div>
+                </div>
+                
+                <div id="image-optimization-tab" class="demo-content">
+                    <p>图片优化是性能提升的关键，占页面体积的大部分：</p>
+                    
+                    <div class="demo-code">
+<span class="code-comment">// 传统方式：未经优化的图片</span><br>
+&lt;<span class="code-keyword">img</span> <span class="code-variable">src</span>=<span class="code-string">"photo.jpg"</span> <span class="code-variable">alt</span>=<span class="code-string">"照片"</span> /&gt;<br><br>
+
+<span class="code-comment">// 优化1：使用合适的图片格式</span><br>
+&lt;<span class="code-keyword">picture</span>&gt;<br>
+&nbsp;&nbsp;&lt;<span class="code-keyword">source</span> <span class="code-variable">srcset</span>=<span class="code-string">"photo.webp"</span> <span class="code-variable">type</span>=<span class="code-string">"image/webp"</span>&gt;<br>
+&nbsp;&nbsp;&lt;<span class="code-keyword">source</span> <span class="code-variable">srcset</span>=<span class="code-string">"photo.jpg"</span> <span class="code-variable">type</span>=<span class="code-string">"image/jpeg"</span>&gt;<br>
+&nbsp;&nbsp;&lt;<span class="code-keyword">img</span> <span class="code-variable">src</span>=<span class="code-string">"photo.jpg"</span> <span class="code-variable">alt</span>=<span class="code-string">"照片"</span>&gt;<br>
+&lt;/<span class="code-keyword">picture</span>&gt;<br><br>
+
+<span class="code-comment">// 优化2：响应式图片（不同设备加载不同尺寸）</span><br>
+&lt;<span class="code-keyword">img</span> <br>
+&nbsp;&nbsp;<span class="code-variable">src</span>=<span class="code-string">"photo-small.jpg"</span><br>
+&nbsp;&nbsp;<span class="code-variable">srcset</span>=<span class="code-string">"photo-small.jpg 500w, photo-medium.jpg 1000w, photo-large.jpg 2000w"</span><br>
+&nbsp;&nbsp;<span class="code-variable">sizes</span>=<span class="code-string">"(max-width: 600px) 480px, (max-width: 1200px) 800px, 1200px"</span><br>
+&nbsp;&nbsp;<span class="code-variable">alt</span>=<span class="code-string">"响应式照片"</span><br>
+/&gt;<br><br>
+
+<span class="code-comment">// 优化3：使用CSS实现简单图形替代图片</span><br>
+&lt;<span class="code-keyword">style</span>&gt;<br>
+<span class="code-comment">/* 使用CSS渐变替代渐变图片 */</span><br>
+.gradient-bg {<br>
+&nbsp;&nbsp;background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);<br>
+}<br>
+<br>
+<span class="code-comment">/* 使用CSS绘制简单图标替代图标图片 */</span><br>
+.icon-check {<br>
+&nbsp;&nbsp;width: 20px;<br>
+&nbsp;&nbsp;height: 20px;<br>
+&nbsp;&nbsp;border: 2px solid #2b8a3e;<br>
+&nbsp;&nbsp;border-top: none;<br>
+&nbsp;&nbsp;border-right: none;<br>
+&nbsp;&nbsp;transform: rotate(-45deg);<br>
+}<br>
+&lt;/<span class="code-keyword">style</span>&gt;
+                    </div>
+                </div>
+                
+                <div id="rendering-tab" class="demo-content">
+                    <p>渲染优化可以减少浏览器的重绘和重排，提升页面流畅度：</p>
+                    
+                    <div class="demo-code">
+<span class="code-comment">// 问题：频繁操作DOM导致多次重排</span><br>
+<span class="code-keyword">function</span> <span class="code-function">updateItemsBad</span>() {<br>
+&nbsp;&nbsp;<span class="code-keyword">const</span> container = <span class="code-keyword">document</span>.<span class="code-function">getElementById</span>(<span class="code-string">'container'</span>);<br>
+&nbsp;&nbsp;<span class="code-keyword">for</span> (<span class="code-keyword">let</span> i = <span class="code-number">0</span>; i &lt; <span class="code-number">100</span>; i++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">const</span> item = <span class="code-keyword">document</span>.<span class="code-function">createElement</span>(<span class="code-string">'div'</span>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;item.textContent = <span class="code-string">`项目 <span class="code-variable">${i}</span>`</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;container.<span class="code-function">appendChild</span>(item); <span class="code-comment">// 每次都会触发重排</span><br>
+&nbsp;&nbsp;}<br>
+}<br><br>
+
+<span class="code-comment">// 优化：使用DocumentFragment批量操作</span><br>
+<span class="code-keyword">function</span> <span class="code-function">updateItemsGood</span>() {<br>
+&nbsp;&nbsp;<span class="code-keyword">const</span> container = <span class="code-keyword">document</span>.<span class="code-function">getElementById</span>(<span class="code-string">'container'</span>);<br>
+&nbsp;&nbsp;<span class="code-keyword">const</span> fragment = <span class="code-keyword">document</span>.<span class="code-function">createDocumentFragment</span>();<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-keyword">for</span> (<span class="code-keyword">let</span> i = <span class="code-number">0</span>; i &lt; <span class="code-number">100</span>; i++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">const</span> item = <span class="code-keyword">document</span>.<span class="code-function">createElement</span>(<span class="code-string">'div'</span>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;item.textContent = <span class="code-string">`项目 <span class="code-variable">${i}</span>`</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;fragment.<span class="code-function">appendChild</span>(item); <span class="code-comment">// 不会触发重排</span><br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;container.<span class="code-function">appendChild</span>(fragment); <span class="code-comment">// 只触发一次重排</span><br>
+}<br><br>
+
+<span class="code-comment">// 优化：使用requestAnimationFrame优化动画性能</span><br>
+<span class="code-comment">// 传统方式：使用setInterval可能导致丢帧</span><br>
+<span class="code-keyword">let</span> angle = <span class="code-number">0</span>;<br>
+<span class="code-keyword">const</span> intervalId = <span class="code-function">setInterval</span>(() =&gt; {<br>
+&nbsp;&nbsp;angle += <span class="code-number">1</span>;<br>
+&nbsp;&nbsp;<span class="code-keyword">document</span>.<span class="code-function">getElementById</span>(<span class="code-string">'element'</span>).style.transform = <span class="code-string">`rotate(<span class="code-variable">${angle}</span>deg)`</span>;<br>
+}, <span class="code-number">16</span>); <span class="code-comment">// 约60fps</span><br><br>
+
+<span class="code-comment">// 优化方式：使用requestAnimationFrame</span><br>
+<span class="code-keyword">function</span> <span class="code-function">animate</span>() {<br>
+&nbsp;&nbsp;angle += <span class="code-number">1</span>;<br>
+&nbsp;&nbsp;<span class="code-keyword">document</span>.<span class="code-function">getElementById</span>(<span class="code-string">'element'</span>).style.transform = <span class="code-string">`rotate(<span class="code-variable">${angle}</span>deg)`</span>;<br>
+&nbsp;&nbsp;<span class="code-function">requestAnimationFrame</span>(animate);<br>
+}<br>
+<span class="code-function">requestAnimationFrame</span>(animate);
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">性能优化对比分析</h2>
+            
+            <div class="interactive-demo">
+                <div class="demo-controls">
+                    <button class="demo-btn performance" id="runPerformanceTest">运行性能测试</button>
+                    <button class="demo-btn optimized" id="showOptimized">显示优化方案</button>
+                    <button class="demo-btn" id="resetComparison">重置</button>
+                </div>
+                
+                <div class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>优化领域</th>
+                            <th>未优化</th>
+                            <th>优化后</th>
+                            <th>性能提升</th>
+                            <th>影响等级</th>
+                        </tr>
+                    </thead>
+                    <tbody id="comparisonBody">
+                        <tr>
+                            <td>图片加载</td>
+                            <td>5.2MB / 12图片</td>
+                            <td>1.8MB / 12图片</td>
+                            <td>65%</td>
+                            <td><span class="performance-badge badge-good">高</span></td>
+                        </tr>
+                        <tr>
+                            <td>JavaScript包大小</td>
+                            <td>1.8MB (单文件)</td>
+                            <td>420KB (初始) + 懒加载</td>
+                            <td>77%</td>
+                            <td><span class="performance-badge badge-good">高</span></td>
+                        </tr>
+                        <tr>
+                            <td>CSS文件大小</td>
+                            <td>320KB (包含未使用)</td>
+                            <td>85KB (PurgeCSS后)</td>
+                            <td>73%</td>
+                            <td><span class="performance-badge badge-medium">中</span></td>
+                        </tr>
+                        <tr>
+                            <td>首字节时间</td>
+                            <td>1200ms</td>
+                            <td>450ms</td>
+                            <td>63%</td>
+                            <td><span class="performance-badge badge-good">高</span></td>
+                        </tr>
+                        <tr>
+                            <td>LCP (最大内容绘制)</td>
+                            <td>4.8s</td>
+                            <td>1.9s</td>
+                            <td>60%</td>
+                            <td><span class="performance-badge badge-good">高</span></td>
+                        </tr>
+                        <tr>
+                            <td>FID (首次输入延迟)</td>
+                            <td>280ms</td>
+                            <td>45ms</td>
+                            <td>84%</td>
+                            <td><span class="performance-badge badge-good">高</span></td>
+                        </tr>
+                    </tbody>
+                </div>
+                
+                <div class="performance-chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+                
+                <div id="optimizationDetails" style="display: none; margin-top: 20px;">
+                    <h4 style="margin-bottom: 15px; color: #2c3e50;">优化实施建议</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+                        <div style="background-color: #e7f5ff; padding: 15px; border-radius: 6px;">
+                            <div style="font-weight: 600; margin-bottom: 8px; color: #1971c2;">图片优化</div>
+                            <div style="font-size: 0.9rem;">使用WebP格式，实现响应式图片和懒加载</div>
+                        </div>
+                        <div style="background-color: #d3f9d8; padding: 15px; border-radius: 6px;">
+                            <div style="font-weight: 600; margin-bottom: 8px; color: #2b8a3e;">代码分割</div>
+                            <div style="font-size: 0.9rem;">基于路由和组件分割代码，使用动态导入</div>
+                        </div>
+                        <div style="background-color: #fff3bf; padding: 15px; border-radius: 6px;">
+                            <div style="font-weight: 600; margin-bottom: 8px; color: #e67700;">缓存策略</div>
+                            <div style="font-size: 0.9rem;">设置适当的Cache-Control头部，使用Service Worker</div>
+                        </div>
+                        <div style="background-color: #ffdeeb; padding: 15px; border-radius: 6px;">
+                            <div style="font-weight: 600; margin-bottom: 8px; color: #a61e4d;">渲染优化</div>
+                            <div style="font-size: 0.9rem;">避免强制同步布局，使用transform和opacity实现动画</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">性能监控与工具</h2>
+            
+            <div style="margin: 25px 0;">
+                <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;">
+                    <i class="fas fa-tachometer-alt" style="color: #c92a2a; font-size: 1.5rem; margin-top: 5px;"></i>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">Lighthouse</h4>
+                        <p>Google提供的自动化工具，可评估网站性能、可访问性、SEO等，并提供改进建议。</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;">
+                    <i class="fas fa-chart-line" style="color: #c92a2a; font-size: 1.5rem; margin-top: 5px;"></i>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">WebPageTest</h4>
+                        <p>提供详细的性能测试，支持多地点、多浏览器测试，生成瀑布图和性能指标。</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;">
+                    <i class="fas fa-wrench" style="color: #c92a2a; font-size: 1.5rem; margin-top: 5px;"></i>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">Chrome DevTools</h4>
+                        <p>内置的性能面板、网络面板、内存面板等，用于深入分析性能问题。</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; align-items: flex-start; gap: 15px;">
+                    <i class="fas fa-broadcast-tower" style="color: #c92a2a; font-size: 1.5rem; margin-top: 5px;"></i>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">真实用户监控 (RUM)</h4>
+                        <p>通过收集真实用户数据监控性能，如Google Analytics、New Relic等。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 style="margin: 30px 0 15px; color: #495057;">性能优化检查清单</h3>
+            <div style="padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+                <ol style="padding-left: 20px;">
+                    <li><strong>最小化资源</strong>：压缩HTML、CSS、JavaScript，移除未使用代码</li>
+                    <li><strong>优化图片</strong>：使用适当格式和尺寸，实现响应式图片和懒加载</li>
+                    <li><strong>利用缓存</strong>：设置合适的缓存策略，使用Service Worker</li>
+                    <li><strong>减少重定向</strong>：消除不必要的重定向，特别是移动端</li>
+                    <li><strong>优化CSS交付</strong>：内联关键CSS，异步加载非关键CSS</li>
+                    <li><strong>优化JavaScript</strong>：延迟非关键JS，使用async/defer属性</li>
+                    <li><strong>服务器优化</strong>：启用压缩(Gzip/Brotli)，使用HTTP/2，配置CDN</li>
+                    <li><strong>监控与测试</strong>：定期进行性能测试，建立性能预算</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">关键发现与最佳实践</h2>
+            
+            <ul class="analysis-list">
+                <li>
+                    <i class="fas fa-chart-line list-icon"></i>
+                    <div>
+                        <strong>性能影响业务指标</strong>：页面加载时间延迟1秒可能导致转化率下降7%，跳出率增加。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-mobile-alt list-icon"></i>
+                    <div>
+                        <strong>移动优先至关重要</strong>：移动设备上的性能通常比桌面差3-5倍，需要特别优化。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-weight-hanging list-icon"></i>
+                    <div>
+                        <strong>建立性能预算</strong>：为关键资源设置大小限制，如JS不超过170KB，CSS不超过50KB。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-tachometer-alt list-icon"></i>
+                    <div>
+                        <strong>持续监控</strong>：性能优化不是一次性任务，需要持续监控和优化。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-user-check list-icon"></i>
+                    <div>
+                        <strong>以用户为中心</strong>：关注用户感知的性能指标，而非仅仅技术指标。
+                    </div>
+                </li>
+            </ul>
+            
+            <div style="margin-top: 25px; padding: 20px; background-color: #e7f5ff; border-radius: 8px;">
+                <h4 style="color: #1971c2; margin-bottom: 10px;">实施建议</h4>
+                <ol style="padding-left: 20px;">
+                    <li>从性能影响最大的领域开始（通常是图片和JavaScript）</li>
+                    <li>使用自动化工具（如Webpack、Parcel）进行代码优化</li>
+                    <li>实施渐进式优化策略，优先优化关键渲染路径</li>
+                    <li>建立性能文化，将性能作为开发流程的一部分</li>
+                    <li>定期进行性能审计，确保优化效果持续</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">相关案例</h2>
+            <div class="related-cases">
+                <a href="case-analysis-001.html" class="related-case">
+                    <h4>CSS布局问题分析与解决</h4>
+                    <p>CSS优化对渲染性能的影响</p>
+                </a>
+                <a href="case-analysis-002.html" class="related-case">
+                    <h4>JavaScript异步编程模式</h4>
+                    <p>异步加载对性能的优化</p>
+                </a>
+                <a href="index.html" class="related-case">
+                    <h4>查看所有案例</h4>
+                    <p>返回主页面浏览完整案例列表</p>
+                </a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>历史记录分析系统 &copy; 2023 | 案例编号: REC006</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 交互演示功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 选项卡功能
+            const tabs = document.querySelectorAll('.demo-tab');
+            const contents = document.querySelectorAll('.demo-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    
+                    // 移除所有active类
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    
+                    // 添加active类
+                    this.classList.add('active');
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+            
+            // 性能对比图表
+            let performanceChart = null;
+            
+            // 初始化性能图表
+            function initPerformanceChart() {
+                const ctx = document.getElementById('performanceChart').getContext('2d');
+                
+                // 销毁之前的图表
+                if (performanceChart) {
+                    performanceChart.destroy();
+                }
+                
+                performanceChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['图片加载', 'JS包大小', 'CSS文件', '首字节时间', 'LCP', 'FID'],
+                        datasets: [
+                            {
+                                label: '未优化',
+                                data: [5.2, 1.8, 0.32, 1.2, 4.8, 0.28],
+                                backgroundColor: '#ff6b6b',
+                                borderColor: '#ff6b6b',
+                                borderWidth: 1
+                            },
+                            {
+                                label: '优化后',
+                                data: [1.8, 0.42, 0.085, 0.45, 1.9, 0.045],
+                                backgroundColor: '#51cf66',
+                                borderColor: '#51cf66',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '值 (MB / 秒)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.dataIndex <= 2) {
+                                            label += context.parsed.y.toFixed(2) + 'MB';
+                                        } else {
+                                            label += context.parsed.y.toFixed(2) + '秒';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 运行性能测试
+            document.getElementById('runPerformanceTest').addEventListener('click', function() {
+                // 模拟性能测试过程
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 测试中...';
+                
+                setTimeout(() => {
+                    this.innerHTML = '测试完成';
+                    this.style.backgroundColor = '#2b8a3e';
+                    
+                    // 初始化图表
+                    initPerformanceChart();
+                    
+                    // 启用显示优化方案按钮
+                    document.getElementById('showOptimized').disabled = false;
+                }, 1500);
+            });
+            
+            // 显示优化方案
+            document.getElementById('showOptimized').addEventListener('click', function() {
+                document.getElementById('optimizationDetails').style.display = 'block';
+                
+                // 高亮显示优化后的表格行
+                const rows = document.querySelectorAll('#comparisonBody tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 4) {
+                        // 添加动画效果
+                        row.style.transition = 'background-color 0.5s';
+                        row.style.backgroundColor = '#f8fff9';
+                        
+                        // 突出显示优化后的值
+                        cells[2].style.fontWeight = '700';
+                        cells[2].style.color = '#2b8a3e';
+                    }
+                });
+            });
+            
+            // 重置
+            document.getElementById('resetComparison').addEventListener('click', function() {
+                // 重置按钮状态
+                document.getElementById('runPerformanceTest').disabled = false;
+                document.getElementById('runPerformanceTest').innerHTML = '运行性能测试';
+                document.getElementById('runPerformanceTest').style.backgroundColor = '';
+                
+                document.getElementById('showOptimized').disabled = true;
+                
+                // 隐藏优化详情
+                document.getElementById('optimizationDetails').style.display = 'none';
+                
+                // 重置表格样式
+                const rows = document.querySelectorAll('#comparisonBody tr');
+                rows.forEach(row => {
+                    row.style.backgroundColor = '';
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 4) {
+                        cells[2].style.fontWeight = '';
+                        cells[2].style.color = '';
+                    }
+                });
+                
+                // 清空图表
+                if (performanceChart) {
+                    performanceChart.destroy();
+                    performanceChart = null;
+                }
+                
+                // 清空画布
+                const canvas = document.getElementById('performanceChart');
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 显示提示
+                ctx.fillStyle = '#e0e0e0';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('点击"运行性能测试"查看对比图表', canvas.width/2, canvas.height/2);
+            });
+            
+            // 初始化时重置
+            document.getElementById('resetComparison').click();
+            
+            console.log('案例页面加载完成: 前端性能优化策略');
+        });
+    </script>
+</body>
+</html>
