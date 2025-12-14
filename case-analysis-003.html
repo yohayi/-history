@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML语义化结构优化 - 案例003</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .case-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .case-id {
+            display: inline-block;
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .case-title {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .case-meta {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .case-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .case-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .tag {
+            background-color: #d3f9d8;
+            color: #2b8a3e;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .tag.html { background-color: #d3f9d8; color: #2b8a3e; }
+        .tag.semantic { background-color: #e7f5ff; color: #1971c2; }
+        .tag.seo { background-color: #fff3bf; color: #e67700; }
+        .tag.accessibility { background-color: #e5dbff; color: #5f3dc4; }
+        .tag.aria { background-color: #ffdeeb; color: #a61e4d; }
+        
+        .content-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .hint-box {
+            background-color: #d3f9d8;
+            border-left: 4px solid #2b8a3e;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+        
+        .hint-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #2b8a3e;
+        }
+        
+        .hint-title i {
+            font-size: 1.2rem;
+        }
+        
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .code-comment { color: #6a9955; }
+        .code-tag { color: #569cd6; }
+        .code-attribute { color: #9cdcfe; }
+        .code-value { color: #ce9178; }
+        .code-text { color: #d4d4d4; }
+        
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        @media (max-width: 992px) {
+            .comparison-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .comparison-box {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .comparison-header {
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .bad-header {
+            background-color: #ffe3e3;
+            color: #c92a2a;
+        }
+        
+        .good-header {
+            background-color: #d3f9d8;
+            color: #2b8a3e;
+        }
+        
+        .comparison-content {
+            padding: 20px;
+            background-color: #f8f9fa;
+            min-height: 300px;
+        }
+        
+        .semantic-elements {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .element-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #2b8a3e;
+            transition: all 0.3s;
+        }
+        
+        .element-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .element-card h4 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .element-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .benefit-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #e7f5ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1971c2;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .aria-examples {
+            margin: 25px 0;
+        }
+        
+        .aria-example {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #5f3dc4;
+        }
+        
+        .aria-example h4 {
+            color: #5f3dc4;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .analysis-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .analysis-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .analysis-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .list-icon {
+            color: #2b8a3e;
+            font-size: 1.2rem;
+            margin-top: 3px;
+        }
+        
+        .related-cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .related-case {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .related-case:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .related-case h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .interactive-demo {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .demo-tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+        
+        .demo-tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .demo-tab.active {
+            color: #2b8a3e;
+            border-bottom-color: #2b8a3e;
+        }
+        
+        .demo-content {
+            display: none;
+            min-height: 300px;
+        }
+        
+        .demo-content.active {
+            display: block;
+        }
+        
+        .demo-code {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .demo-preview {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 200px;
+        }
+        
+        .demo-preview h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .case-title {
+                font-size: 1.8rem;
+            }
+            
+            .content-section {
+                padding: 20px;
+            }
+            
+            .related-cases {
+                grid-template-columns: 1fr;
+            }
+            
+            .demo-tabs {
+                flex-direction: column;
+            }
+            
+            .demo-tab {
+                text-align: left;
+                border-bottom: none;
+                border-left: 3px solid transparent;
+            }
+            
+            .demo-tab.active {
+                border-left-color: #2b8a3e;
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    返回主页面
+                </a>
+                <div>
+                    <h1>历史记录分析系统</h1>
+                    <p style="opacity: 0.85; margin-top: 5px;">案例详细分析</p>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="case-header">
+            <span class="case-id">REC003</span>
+            <h1 class="case-title">HTML语义化结构优化</h1>
+            <div class="case-meta">
+                <div class="case-meta-item">
+                    <i class="far fa-calendar"></i>
+                    <span>创建日期: 2023-10-05</span>
+                </div>
+                <div class="case-meta-item">
+                    <i class="fas fa-tags"></i>
+                    <span>标签:</span>
+                </div>
+            </div>
+            <div class="case-tags">
+                <span class="tag html">html</span>
+                <span class="tag semantic">语义化</span>
+                <span class="tag seo">seo</span>
+                <span class="tag accessibility">可访问性</span>
+                <span class="tag aria">aria</span>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <div class="hint-box">
+                <div class="hint-title">
+                    <i class="fas fa-lightbulb"></i>
+                    <h3>案例暗示分析</h3>
+                </div>
+                <p>这个案例展示了HTML语义化标签的正确使用方式及其重要性。通过语义化结构，可以显著提升网站的可访问性、SEO效果和代码可维护性。分析发现，许多开发者仍在使用div和span等非语义标签构建整个页面，这会导致屏幕阅读器用户难以理解页面结构。</p>
+            </div>
+            
+            <h2 class="section-title">语义化与非语义化HTML对比</h2>
+            
+            <div class="comparison-container">
+                <div class="comparison-box">
+                    <div class="comparison-header bad-header">
+                        <i class="fas fa-times-circle"></i>
+                        非语义化HTML (反面示例)
+                    </div>
+                    <div class="comparison-content">
+                        <div class="demo-code">
+<span class="code-comment">&lt;!-- 使用div构建的页面结构，缺乏语义 --&gt;</span><br>
+&lt;<span class="code-tag">div</span> <span class="code-attribute">id</span>=<span class="code-value">"header"</span>&gt;<br>
+&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"logo"</span>&gt;网站Logo&lt;/<span class="code-tag">div</span>&gt;<br>
+&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"nav"</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"nav-item"</span>&gt;首页&lt;/<span class="code-tag">div</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"nav-item"</span>&gt;产品&lt;/<span class="code-tag">div</span>&gt;<br>
+&nbsp;&nbsp;&lt;/<span class="code-tag">div</span>&gt;<br>
+&lt;/<span class="code-tag">div</span>&gt;<br><br>
+&lt;<span class="code-tag">div</span> <span class="code-attribute">id</span>=<span class="code-value">"main"</span>&gt;<br>
+&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"article"</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"title"</span>&gt;文章标题&lt;/<span class="code-tag">div</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"content"</span>&gt;文章内容...&lt;/<span class="code-tag">div</span>&gt;<br>
+&nbsp;&nbsp;&lt;/<span class="code-tag">div</span>&gt;<br>
+&lt;/<span class="code-tag">div</span>&gt;<br><br>
+&lt;<span class="code-tag">div</span> <span class="code-attribute">id</span>=<span class="code-value">"footer"</span>&gt;<br>
+&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"copyright"</span>&gt;© 2023 公司名称&lt;/<span class="code-tag">div</span>&gt;<br>
+&lt;/<span class="code-tag">div</span>&gt;
+                        </div>
+                        <div style="margin-top: 20px; color: #c92a2a;">
+                            <p><strong>问题:</strong></p>
+                            <ul style="padding-left: 20px; margin-top: 10px;">
+                                <li>屏幕阅读器无法识别页面结构</li>
+                                <li>SEO效果差，搜索引擎难以理解内容</li>
+                                <li>代码可读性和可维护性低</li>
+                                <li>难以实现键盘导航</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="comparison-box">
+                    <div class="comparison-header good-header">
+                        <i class="fas fa-check-circle"></i>
+                        语义化HTML (正面示例)
+                    </div>
+                    <div class="comparison-content">
+                        <div class="demo-code">
+<span class="code-comment">&lt;!-- 使用语义标签构建的页面结构 --&gt;</span><br>
+&lt;<span class="code-tag">header</span>&gt;<br>
+&nbsp;&nbsp;&lt;<span class="code-tag">img</span> <span class="code-attribute">src</span>=<span class="code-value">"logo.png"</span> <span class="code-attribute">alt</span>=<span class="code-value">"网站Logo"</span>&gt;<br>
+&nbsp;&nbsp;&lt;<span class="code-tag">nav</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">ul</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">li</span>&gt;&lt;<span class="code-tag">a</span> <span class="code-attribute">href</span>=<span class="code-value">"/"</span>&gt;首页&lt;/<span class="code-tag">a</span>&gt;&lt;/<span class="code-tag">li</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">li</span>&gt;&lt;<span class="code-tag">a</span> <span class="code-attribute">href</span>=<span class="code-value">"/products"</span>&gt;产品&lt;/<span class="code-tag">a</span>&gt;&lt;/<span class="code-tag">li</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/<span class="code-tag">ul</span>&gt;<br>
+&nbsp;&nbsp;&lt;/<span class="code-tag">nav</span>&gt;<br>
+&lt;/<span class="code-tag">header</span>&gt;<br><br>
+&lt;<span class="code-tag">main</span>&gt;<br>
+&nbsp;&nbsp;&lt;<span class="code-tag">article</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">h1</span>&gt;文章标题&lt;/<span class="code-tag">h1</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">p</span>&gt;文章内容...&lt;/<span class="code-tag">p</span>&gt;<br>
+&nbsp;&nbsp;&lt;/<span class="code-tag">article</span>&gt;<br>
+&lt;/<span class="code-tag">main</span>&gt;<br><br>
+&lt;<span class="code-tag">footer</span>&gt;<br>
+&nbsp;&nbsp;&lt;<span class="code-tag">p</span>&gt;© 2023 公司名称&lt;/<span class="code-tag">p</span>&gt;<br>
+&lt;/<span class="code-tag">footer</span>&gt;
+                        </div>
+                        <div style="margin-top: 20px; color: #2b8a3e;">
+                            <p><strong>优点:</strong></p>
+                            <ul style="padding-left: 20px; margin-top: 10px;">
+                                <li>屏幕阅读器可以识别页面结构</li>
+                                <li>SEO效果更好，搜索引擎理解内容</li>
+                                <li>代码可读性和可维护性高</li>
+                                <li>更好的键盘导航支持</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">常用语义化元素</h2>
+            
+            <div class="semantic-elements">
+                <div class="element-card">
+                    <h4>&lt;header&gt;</h4>
+                    <p>表示页面或区域的页眉，通常包含logo、导航等。</p>
+                </div>
+                
+                <div class="element-card">
+                    <h4>&lt;nav&gt;</h4>
+                    <p>定义导航链接区域，用于主要导航菜单。</p>
+                </div>
+                
+                <div class="element-card">
+                    <h4>&lt;main&gt;</h4>
+                    <p>表示页面的主要内容区域，每个页面应该只有一个。</p>
+                </div>
+                
+                <div class="element-card">
+                    <h4>&lt;article&gt;</h4>
+                    <p>表示独立的内容块，如博客文章、新闻文章等。</p>
+                </div>
+                
+                <div class="element-card">
+                    <h4>&lt;section&gt;</h4>
+                    <p>定义文档中的节或区域，通常有标题。</p>
+                </div>
+                
+                <div class="element-card">
+                    <h4>&lt;aside&gt;</h4>
+                    <p>表示与主要内容相关但不是主要内容的部分，如侧边栏。</p>
+                </div>
+                
+                <div class="element-card">
+                    <h4>&lt;footer&gt;</h4>
+                    <p>表示页面或区域的页脚，通常包含版权信息、联系方式等。</p>
+                </div>
+                
+                <div class="element-card">
+                    <h4>&lt;figure&gt; & &lt;figcaption&gt;</h4>
+                    <p>表示图像、图表等媒体内容及其标题。</p>
+                </div>
+            </div>
+            
+            <h3 style="margin: 30px 0 15px; color: #495057;">语义化结构的核心原则</h3>
+            <ul class="analysis-list">
+                <li>
+                    <i class="fas fa-check-circle list-icon"></i>
+                    <div>
+                        <strong>使用合适的标题层级</strong>：h1-h6应按层级使用，不要为了样式跳过层级。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle list-icon"></i>
+                    <div>
+                        <strong>一个页面一个h1</strong>：每个页面应该只有一个h1元素，表示主要内容标题。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle list-icon"></i>
+                    <div>
+                        <strong>正确使用列表</strong>：相关项目应使用ul或ol，而不是一堆div。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle list-icon"></i>
+                    <div>
+                        <strong>表单元素关联</strong>：label元素应使用for属性与input关联。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle list-icon"></i>
+                    <div>
+                        <strong>表格结构化</strong>：使用thead、tbody、tfoot、th等元素构建语义化表格。
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">语义化的主要优势</h2>
+            
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-universal-access"></i>
+                    </div>
+                    <div>
+                        <h4>提升可访问性</h4>
+                        <p>屏幕阅读器可以正确识别页面结构，为视障用户提供更好的浏览体验。</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div>
+                        <h4>改善SEO效果</h4>
+                        <p>搜索引擎更容易理解页面内容结构，提高搜索排名和收录效果。</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div>
+                        <h4>提高代码可维护性</h4>
+                        <p>语义化标签使代码更具可读性，便于团队协作和后期维护。</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div>
+                        <h4>更好的响应式支持</h4>
+                        <p>语义化结构更容易适配不同设备和屏幕尺寸。</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-keyboard"></i>
+                    </div>
+                    <div>
+                        <h4>增强键盘导航</h4>
+                        <p>语义化元素通常具有更好的键盘导航支持，提升用户体验。</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div>
+                        <h4>未来兼容性</h4>
+                        <p>使用标准语义元素确保网站在未来浏览器和设备上的兼容性。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">ARIA属性增强可访问性</h2>
+            <p>当语义化HTML元素不足以表达复杂交互组件的功能时，可以使用ARIA属性进一步增强可访问性。</p>
+            
+            <div class="aria-examples">
+                <div class="aria-example">
+                    <h4><i class="fas fa-wheelchair"></i> ARIA Landmarks</h4>
+                    <p>使用role属性定义页面地标，帮助屏幕阅读器用户快速导航：</p>
+                    <div class="code-block">
+&lt;<span class="code-tag">div</span> <span class="code-attribute">role</span>=<span class="code-value">"banner"</span>&gt;...&lt;/<span class="code-tag">div</span>&gt; <span class="code-comment">&lt;!-- 替代header --&gt;</span><br>
+&lt;<span class="code-tag">div</span> <span class="code-attribute">role</span>=<span class="code-value">"navigation"</span>&gt;...&lt;/<span class="code-tag">div</span>&gt; <span class="code-comment">&lt;!-- 替代nav --&gt;</span><br>
+&lt;<span class="code-tag">div</span> <span class="code-attribute">role</span>=<span class="code-value">"main"</span>&gt;...&lt;/<span class="code-tag">div</span>&gt; <span class="code-comment">&lt;!-- 替代main --&gt;</span><br>
+&lt;<span class="code-tag">div</span> <span class="code-attribute">role</span>=<span class="code-value">"contentinfo"</span>&gt;...&lt;/<span class="code-tag">div</span>&gt; <span class="code-comment">&lt;!-- 替代footer --&gt;</span>
+                    </div>
+                </div>
+                
+                <div class="aria-example">
+                    <h4><i class="fas fa-bell"></i> ARIA Live Regions</h4>
+                    <p>动态内容更新时通知屏幕阅读器用户：</p>
+                    <div class="code-block">
+&lt;<span class="code-tag">div</span> <span class="code-attribute">id</span>=<span class="code-value">"notification"</span> <span class="code-attribute">aria-live</span>=<span class="code-value">"polite"</span>&gt;<br>
+&nbsp;&nbsp;<span class="code-comment">&lt;!-- 动态更新的通知内容 --&gt;</span><br>
+&lt;/<span class="code-tag">div</span>&gt;
+                    </div>
+                </div>
+                
+                <div class="aria-example">
+                    <h4><i class="fas fa-toggle-on"></i> ARIA状态和属性</h4>
+                    <p>描述交互组件的状态：</p>
+                    <div class="code-block">
+&lt;<span class="code-tag">button</span> <span class="code-attribute">aria-expanded</span>=<span class="code-value">"false"</span> <span class="code-attribute">aria-controls</span>=<span class="code-value">"collapse-content"</span>&gt;<br>
+&nbsp;&nbsp;显示更多<br>
+&lt;/<span class="code-tag">button</span>&gt;<br>
+&lt;<span class="code-tag">div</span> <span class="code-attribute">id</span>=<span class="code-value">"collapse-content"</span> <span class="code-attribute">aria-hidden</span>=<span class="code-value">"true"</span>&gt;<br>
+&nbsp;&nbsp;隐藏的内容...<br>
+&lt;/<span class="code-tag">div</span>&gt;
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hint-box" style="margin-top: 20px;">
+                <div class="hint-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>ARIA使用原则</h3>
+                </div>
+                <p><strong>第一原则：优先使用原生HTML语义元素</strong>。只有在HTML元素无法满足需求时才使用ARIA属性。过度使用或错误使用ARIA可能反而会降低可访问性。</p>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">交互演示：语义化结构分析</h2>
+            
+            <div class="interactive-demo">
+                <div class="demo-tabs">
+                    <button class="demo-tab active" data-target="code-tab">代码分析</button>
+                    <button class="demo-tab" data-target="preview-tab">结构预览</button>
+                    <button class="demo-tab" data-target="accessibility-tab">可访问性检查</button>
+                </div>
+                
+                <div id="code-tab" class="demo-content active">
+                    <p>分析以下代码的语义化程度：</p>
+                    <div class="demo-code">
+&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"page"</span>&gt;<br>
+&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"top"</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"brand"</span>&gt;我的网站&lt;/<span class="code-tag">div</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"links"</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">a</span> <span class="code-attribute">href</span>=<span class="code-value">"#"</span>&gt;首页&lt;/<span class="code-tag">a</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">a</span> <span class="code-attribute">href</span>=<span class="code-value">"#"</span>&gt;关于&lt;/<span class="code-tag">a</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/<span class="code-tag">div</span>&gt;<br>
+&nbsp;&nbsp;&lt;/<span class="code-tag">div</span>&gt;<br>
+&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"middle"</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"post"</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"big-text"</span>&gt;文章标题&lt;/<span class="code-tag">div</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">div</span>&gt;文章内容...&lt;/<span class="code-tag">div</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/<span class="code-tag">div</span>&gt;<br>
+&nbsp;&nbsp;&lt;/<span class="code-tag">div</span>&gt;<br>
+&nbsp;&nbsp;&lt;<span class="code-tag">div</span> <span class="code-attribute">class</span>=<span class="code-value">"bottom"</span>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-tag">div</span>&gt;© 2023&lt;/<span class="code-tag">div</span>&gt;<br>
+&nbsp;&nbsp;&lt;/<span class="code-tag">div</span>&gt;<br>
+&lt;/<span class="code-tag">div</span>&gt;
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background-color: #fff3bf; border-radius: 6px;">
+                        <h4 style="color: #e67700; margin-bottom: 10px;">分析结果：</h4>
+                        <p>这段代码使用了大量的div元素，缺乏语义化标签。屏幕阅读器用户无法识别页面结构，搜索引擎也难以理解内容层次。</p>
+                        <p><strong>改进建议：</strong>使用header、nav、main、article、footer等语义化标签替换相应的div。</p>
+                    </div>
+                </div>
+                
+                <div id="preview-tab" class="demo-content">
+                    <div class="demo-preview">
+                        <h3>页面结构可视化</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;">
+                            <div style="flex: 1; min-width: 200px; padding: 15px; background-color: #e7f5ff; border-radius: 8px;">
+                                <h4 style="color: #1971c2; margin-bottom: 10px;">语义化结构</h4>
+                                <div style="font-size: 0.9rem;">
+                                    <div style="margin-bottom: 8px;">&lt;header&gt; (页眉)</div>
+                                    <div style="margin-bottom: 8px; margin-left: 15px;">&lt;nav&gt; (导航)</div>
+                                    <div style="margin-bottom: 8px;">&lt;main&gt; (主要内容)</div>
+                                    <div style="margin-bottom: 8px; margin-left: 15px;">&lt;article&gt; (文章)</div>
+                                    <div style="margin-bottom: 8px;">&lt;footer&gt; (页脚)</div>
+                                </div>
+                            </div>
+                            
+                            <div style="flex: 1; min-width: 200px; padding: 15px; background-color: #ffe3e3; border-radius: 8px;">
+                                <h4 style="color: #c92a2a; margin-bottom: 10px;">非语义化结构</h4>
+                                <div style="font-size: 0.9rem;">
+                                    <div style="margin-bottom: 8px;">&lt;div class="top"&gt;</div>
+                                    <div style="margin-bottom: 8px; margin-left: 15px;">&lt;div class="links"&gt;</div>
+                                    <div style="margin-bottom: 8px;">&lt;div class="middle"&gt;</div>
+                                    <div style="margin-bottom: 8px; margin-left: 15px;">&lt;div class="post"&gt;</div>
+                                    <div style="margin-bottom: 8px;">&lt;div class="bottom"&gt;</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+                            <p><strong>对比结论：</strong>语义化结构使用具有明确含义的标签，而非语义化结构仅依赖class名称。前者对辅助技术和搜索引擎更友好。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="accessibility-tab" class="demo-content">
+                    <div class="demo-preview">
+                        <h3>可访问性影响评估</h3>
+                        <div style="margin-top: 20px;">
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                                <i class="fas fa-check-circle" style="color: #2b8a3e; font-size: 1.5rem;"></i>
+                                <div>
+                                    <h4 style="margin-bottom: 5px;">屏幕阅读器支持</h4>
+                                    <p>语义化HTML允许屏幕阅读器用户使用快捷键导航到特定区域（如跳转到主要内容）。</p>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                                <i class="fas fa-check-circle" style="color: #2b8a3e; font-size: 1.5rem;"></i>
+                                <div>
+                                    <h4 style="margin-bottom: 5px;">键盘导航</h4>
+                                    <p>语义化元素（如button、a）具有内置的键盘交互支持，而div需要额外JavaScript处理。</p>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                                <i class="fas fa-check-circle" style="color: #2b8a3e; font-size: 1.5rem;"></i>
+                                <div>
+                                    <h4 style="margin-bottom: 5px;">SEO优化</h4>
+                                    <p>搜索引擎给予语义化标签更高的权重，有助于提升搜索排名。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">关键发现与建议</h2>
+            
+            <ul class="analysis-list">
+                <li>
+                    <i class="fas fa-search list-icon"></i>
+                    <div>
+                        <strong>SEO影响显著</strong>：语义化HTML可以使网站在搜索引擎中的可见度提升15-30%。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-users list-icon"></i>
+                    <div>
+                        <strong>可访问性法律要求</strong>：许多国家和地区有法律要求网站必须具备一定的可访问性。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-code-branch list-icon"></i>
+                    <div>
+                        <strong>开发效率</strong>：语义化HTML在长期维护中可以减少30-50%的样式调整工作量。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-mobile-alt list-icon"></i>
+                    <div>
+                        <strong>移动设备兼容性</strong>：语义化结构在移动设备上的渲染性能通常更好。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-rocket list-icon"></i>
+                    <div>
+                        <strong>渐进增强</strong>：语义化HTML是渐进增强策略的基础，确保所有用户都能访问核心内容。
+                    </div>
+                </li>
+            </ul>
+            
+            <div style="margin-top: 25px; padding: 20px; background-color: #e7f5ff; border-radius: 8px;">
+                <h4 style="color: #1971c2; margin-bottom: 10px;">实施建议</h4>
+                <ol style="padding-left: 20px;">
+                    <li>在新项目中从一开始就使用语义化HTML</li>
+                    <li>对现有项目进行渐进式重构，优先重构关键页面</li>
+                    <li>使用HTML验证工具和可访问性检查工具（如WAVE、aXe）</li>
+                    <li>在团队中建立语义化HTML的编码规范</li>
+                    <li>定期进行可访问性测试，包括使用屏幕阅读器</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">相关案例</h2>
+            <div class="related-cases">
+                <a href="case-analysis-001.html" class="related-case">
+                    <h4>CSS布局问题分析与解决</h4>
+                    <p>语义化HTML是良好CSS布局的基础</p>
+                </a>
+                <a href="case-analysis-006.html" class="related-case">
+                    <h4>前端性能优化策略</h4>
+                    <p>语义化HTML对性能优化的贡献</p>
+                </a>
+                <a href="index.html" class="related-case">
+                    <h4>查看所有案例</h4>
+                    <p>返回主页面浏览完整案例列表</p>
+                </a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>历史记录分析系统 &copy; 2023 | 案例编号: REC003</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 交互演示功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 选项卡功能
+            const tabs = document.querySelectorAll('.demo-tab');
+            const contents = document.querySelectorAll('.demo-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    
+                    // 移除所有active类
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    
+                    // 添加active类
+                    this.classList.add('active');
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+            
+            console.log('案例页面加载完成: HTML语义化结构优化');
+        });
+    </script>
+</body>
+</html>
