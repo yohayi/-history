@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS布局问题分析与解决 - 案例001</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .case-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .case-id {
+            display: inline-block;
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .case-title {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .case-meta {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .case-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .case-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .tag {
+            background-color: #e7f5ff;
+            color: #1971c2;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .tag.css { background-color: #fff3bf; color: #e67700; }
+        
+        .content-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .hint-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+        
+        .hint-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #856404;
+        }
+        
+        .hint-title i {
+            font-size: 1.2rem;
+        }
+        
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .code-comment { color: #6a9955; }
+        .code-selector { color: #d7ba7d; }
+        .code-property { color: #9cdcfe; }
+        .code-value { color: #ce9178; }
+        
+        .analysis-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .analysis-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .analysis-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .list-icon {
+            color: #4dabf7;
+            font-size: 1.2rem;
+            margin-top: 3px;
+        }
+        
+        .related-cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .related-case {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .related-case:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .related-case h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .case-title {
+                font-size: 1.8rem;
+            }
+            
+            .content-section {
+                padding: 20px;
+            }
+            
+            .related-cases {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    返回主页面
+                </a>
+                <div>
+                    <h1>历史记录分析系统</h1>
+                    <p style="opacity: 0.85; margin-top: 5px;">案例详细分析</p>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="case-header">
+            <span class="case-id">REC001</span>
+            <h1 class="case-title">CSS布局问题分析与解决</h1>
+            <div class="case-meta">
+                <div class="case-meta-item">
+                    <i class="far fa-calendar"></i>
+                    <span>创建日期: 2023-10-15</span>
+                </div>
+                <div class="case-meta-item">
+                    <i class="fas fa-tags"></i>
+                    <span>标签:</span>
+                </div>
+            </div>
+            <div class="case-tags">
+                <span class="tag css">css</span>
+                <span class="tag">布局</span>
+                <span class="tag">响应式</span>
+                <span class="tag">flexbox</span>
+                <span class="tag">grid</span>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <div class="hint-box">
+                <div class="hint-title">
+                    <i class="fas fa-lightbulb"></i>
+                    <h3>案例暗示分析</h3>
+                </div>
+                <p>这个案例展示了CSS布局中常见的问题模式，特别是当开发者在Flexbox和Grid布局之间选择不当时出现的问题。通过分析这个案例，可以发现响应式设计中的关键决策点。</p>
+            </div>
+            
+            <h2 class="section-title">问题描述</h2>
+            <p>在开发一个电商网站的产品列表页面时，遇到了以下布局问题：</p>
+            <ul class="analysis-list">
+                <li>
+                    <i class="fas fa-exclamation-triangle list-icon"></i>
+                    <div>
+                        <strong>元素不对齐</strong>：产品卡片在网格中无法垂直对齐，特别是当产品标题行数不同时。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-exclamation-triangle list-icon"></i>
+                    <div>
+                        <strong>响应式问题</strong>：在移动设备上，布局崩溃，元素堆叠不正确。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-exclamation-triangle list-icon"></i>
+                    <div>
+                        <strong>浏览器兼容性</strong>：某些CSS属性在旧版浏览器中不被支持。
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">解决方案</h2>
+            <h3 style="margin-bottom: 15px; color: #495057;">1. 使用CSS Grid进行主要布局</h3>
+            <p>对于产品网格，CSS Grid提供了更好的控制能力：</p>
+            
+            <div class="code-block">
+                <span class="code-comment">/* 使用Grid创建响应式产品网格 */</span><br>
+                <span class="code-selector">.product-grid</span> {<br>
+                &nbsp;&nbsp;<span class="code-property">display</span>: <span class="code-value">grid</span>;<br>
+                &nbsp;&nbsp;<span class="code-property">grid-template-columns</span>: <span class="code-value">repeat(auto-fill, minmax(280px, 1fr))</span>;<br>
+                &nbsp;&nbsp;<span class="code-property">gap</span>: <span class="code-value">30px 20px</span>;<br>
+                &nbsp;&nbsp;<span class="code-property">align-items</span>: <span class="code-value">start</span>;<br>
+                }<br><br>
+                
+                <span class="code-comment">/* 移动设备适配 */</span><br>
+                @<span class="code-selector">media</span> (<span class="code-property">max-width</span>: <span class="code-value">768px</span>) {<br>
+                &nbsp;&nbsp;<span class="code-selector">.product-grid</span> {<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-property">grid-template-columns</span>: <span class="code-value">repeat(2, 1fr)</span>;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-property">gap</span>: <span class="code-value">15px</span>;<br>
+                &nbsp;&nbsp;}<br>
+                }
+            </div>
+            
+            <h3 style="margin-bottom: 15px; margin-top: 30px; color: #495057;">2. 使用Flexbox进行组件内部布局</h3>
+            <p>对于产品卡片内部，Flexbox提供了更好的灵活性：</p>
+            
+            <div class="code-block">
+                <span class="code-comment">/* 产品卡片内部使用Flexbox */</span><br>
+                <span class="code-selector">.product-card</span> {<br>
+                &nbsp;&nbsp;<span class="code-property">display</span>: <span class="code-value">flex</span>;<br>
+                &nbsp;&nbsp;<span class="code-property">flex-direction</span>: <span class="code-value">column</span>;<br>
+                &nbsp;&nbsp;<span class="code-property">height</span>: <span class="code-value">100%</span>;<br>
+                }<br><br>
+                
+                <span class="code-selector">.product-content</span> {<br>
+                &nbsp;&nbsp;<span class="code-property">flex</span>: <span class="code-value">1</span>; <span class="code-comment">/* 使内容区域占据剩余空间 */</span><br>
+                }
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">关键发现</h2>
+            <ul class="analysis-list">
+                <li>
+                    <i class="fas fa-check-circle list-icon"></i>
+                    <div>
+                        <strong>Grid vs Flexbox选择</strong>：Grid适合二维布局（行和列），Flexbox适合一维布局。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle list-icon"></i>
+                    <div>
+                        <strong>性能考虑</strong>：对于大型网格，CSS Grid的性能通常优于纯Flexbox解决方案。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle list-icon"></i>
+                    <div>
+                        <strong>渐进增强</strong>：可以使用特性查询（@supports）为不支持Grid的浏览器提供回退方案。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle list-icon"></i>
+                    <div>
+                        <strong>维护性</strong>：Grid代码通常更简洁，易于维护和修改。
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">相关案例</h2>
+            <div class="related-cases">
+                <a href="case-analysis-006.html" class="related-case">
+                    <h4>前端性能优化策略</h4>
+                    <p>包含CSS性能优化的相关技巧</p>
+                </a>
+                <a href="case-analysis-003.html" class="related-case">
+                    <h4>HTML语义化结构优化</h4>
+                    <p>良好的HTML结构是CSS布局的基础</p>
+                </a>
+                <a href="index.html" class="related-case">
+                    <h4>查看所有案例</h4>
+                    <p>返回主页面浏览完整案例列表</p>
+                </a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>历史记录分析系统 &copy; 2023 | 案例编号: REC001</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 添加简单的代码高亮
+        document.addEventListener('DOMContentLoaded', function() {
+            // 可以在这里添加更复杂的交互
+            console.log('案例页面加载完成: CSS布局问题分析与解决');
+        });
+    </script>
+</body>
+</html>
