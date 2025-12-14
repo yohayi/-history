@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>历史记录分析系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding-bottom: 40px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+            color: #4dabf7;
+        }
+        
+        .logo h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+        
+        .logo span {
+            color: #4dabf7;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            margin-top: 5px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border-radius: 30px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.5);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .filter-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            padding: 20px 20px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-id {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .card-date {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .card-body {
+            padding: 20px;
+            flex-grow: 1;
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+        
+        .card-desc {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .tag {
+            background-color: #e7f5ff;
+            color: #1971c2;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .tag.css { background-color: #fff3bf; color: #e67700; }
+        .tag.js { background-color: #ffe3e3; color: #c92a2a; }
+        .tag.html { background-color: #d3f9d8; color: #2b8a3e; }
+        .tag.php { background-color: #e5dbff; color: #5f3dc4; }
+        .tag.python { background-color: #ffec99; color: #e67700; }
+        
+        .card-footer {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-link {
+            color: #4dabf7;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+        
+        .card-link:hover {
+            color: #1c7ed6;
+        }
+        
+        .card-status {
+            font-size: 0.85rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .status-complete { background-color: #d3f9d8; color: #2b8a3e; }
+        .status-progress { background-color: #fff3bf; color: #e67700; }
+        .status-pending { background-color: #ffe3e3; color: #c92a2a; }
+        
+        .related-sites {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-top: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #4dabf7;
+        }
+        
+        .sites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .site-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .site-item:hover {
+            background-color: #e9ecef;
+            transform: translateY(-3px);
+        }
+        
+        .site-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background-color: #4dabf7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+        
+        .site-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .site-info p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .controls {
+                width: 100%;
+                margin-top: 20px;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sites-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-history"></i>
+                    <div>
+                        <h1>历史记录<span>分析系统</span></h1>
+                        <p class="subtitle">动态卡片式记录与案例暗示分析</p>
+                    </div>
+                </div>
+                <div class="controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="搜索记录、标签或状态...">
+                    </div>
+                    <button class="filter-btn" id="filterBtn">
+                        <i class="fas fa-filter"></i>
+                        <span>筛选</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <main>
+            <div id="cardsContainer" class="main-content">
+                <!-- 动态卡片将通过JavaScript生成 -->
+            </div>
+            
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <i class="fas fa-file-alt"></i>
+                <h3>未找到匹配的记录</h3>
+                <p>尝试使用不同的搜索词或筛选条件</p>
+            </div>
+            
+            <div class="related-sites">
+                <h2 class="section-title">
+                    <i class="fas fa-external-link-alt"></i>
+                    相关网站跳转展示版
+                </h2>
+                <div class="sites-grid">
+                    <a href="https://github.com" class="site-item" target="_blank">
+                        <div class="site-icon">
+                            <i class="fab fa-github"></i>
+                        </div>
+                        <div class="site-info">
+                            <h3>GitHub</h3>
+                            <p>代码托管与版本控制</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://stackoverflow.com" class="site-item" target="_blank">
+                        <div class="site-icon">
+                            <i class="fab fa-stack-overflow"></i>
+                        </div>
+                        <div class="site-info">
+                            <h3>Stack Overflow</h3>
+                            <p>开发者问答社区</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://codepen.io" class="site-item" target="_blank">
+                        <div class="site-icon">
+                            <i class="fab fa-codepen"></i>
+                        </div>
+                        <div class="site-info">
+                            <h3>CodePen</h3>
+                            <p>前端代码在线演示</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://developer.mozilla.org" class="site-item" target="_blank">
+                        <div class="site-icon">
+                            <i class="fab fa-mdn"></i>
+                        </div>
+                        <div class="site-info">
+                            <h3>MDN Web Docs</h3>
+                            <p>Web开发技术文档</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>历史记录分析系统 &copy; 2023 | 点击卡片查看详细案例暗示分析</p>
+        </footer>
+    </div>
+
+    <script>
+        // 模拟数据 - 在实际使用中，这些数据可以来自外部JSON文件或API
+        const records = [
+            {
+                id: "REC001",
+                title: "CSS布局问题分析与解决",
+                description: "深入分析Flexbox和Grid布局的常见问题，提供解决方案和最佳实践示例。",
+                date: "2023-10-15",
+                tags: ["css", "布局", "响应式"],
+                status: "complete",
+                link: "case-analysis-001.html"
+            },
+            {
+                id: "REC002",
+                title: "JavaScript异步编程模式",
+                description: "Promise、Async/Await以及回调函数的比较分析，包含实际应用场景的代码示例。",
+                date: "2023-10-10",
+                tags: ["javascript", "异步", "promise"],
+                status: "complete",
+                link: "case-analysis-002.html"
+            },
+            {
+                id: "REC003",
+                title: "HTML语义化结构优化",
+                description: "如何改进HTML结构以提高可访问性和SEO效果，包含ARIA属性的应用示例。",
+                date: "2023-10-05",
+                tags: ["html", "语义化", "seo"],
+                status: "complete",
+                link: "case-analysis-003.html"
+            },
+            {
+                id: "REC004",
+                title: "PHP后端API接口设计",
+                description: "RESTful API设计原则，包含认证、错误处理和性能优化的实现方法。",
+                date: "2023-09-28",
+                tags: ["php", "api", "restful"],
+                status: "progress",
+                link: "case-analysis-004.html"
+            },
+            {
+                id: "REC005",
+                title: "Python数据分析流程",
+                description: "使用Pandas和NumPy进行数据清洗、分析和可视化的完整流程示例。",
+                date: "2023-09-20",
+                tags: ["python", "数据分析", "pandas"],
+                status: "pending",
+                link: "case-analysis-005.html"
+            },
+            {
+                id: "REC006",
+                title: "前端性能优化策略",
+                description: "针对现代Web应用的前端性能优化方法，包括代码分割、懒加载和缓存策略。",
+                date: "2023-09-15",
+                tags: ["javascript", "性能", "优化"],
+                status: "complete",
+                link: "case-analysis-006.html"
+            }
+        ];
+
+        // 渲染卡片函数
+        function renderCards(filteredRecords = records) {
+            const container = document.getElementById('cardsContainer');
+            const emptyState = document.getElementById('emptyState');
+            
+            // 清空容器
+            container.innerHTML = '';
+            
+            // 如果没有记录，显示空状态
+            if (filteredRecords.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            // 显示空状态
+            emptyState.style.display = 'none';
+            
+            // 渲染每个卡片
+            filteredRecords.forEach(record => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.id = record.id;
+                
+                // 为卡片添加点击事件，跳转到子页面
+                card.addEventListener('click', () => {
+                    window.location.href = record.link;
+                });
+                
+                // 根据标签确定CSS类
+                const tagClass = record.tags[0] || 'default';
+                
+                // 状态文本
+                const statusText = {
+                    'complete': '已完成',
+                    'progress': '进行中',
+                    'pending': '待处理'
+                };
+                
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="card-id">${record.id}</span>
+                        <span class="card-date">${record.date}</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">${record.title}</h3>
+                        <p class="card-desc">${record.description}</p>
+                        <div class="card-tags">
+                            ${record.tags.map(tag => `<span class="tag ${tag}">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="${record.link}" class="card-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            查看详细分析
+                        </a>
+                        <span class="card-status status-${record.status}">${statusText[record.status]}</span>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // 搜索功能
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                
+                if (searchTerm === '') {
+                    renderCards();
+                    return;
+                }
+                
+                const filtered = records.filter(record => {
+                    // 搜索ID、标题、描述、标签
+                    return record.id.toLowerCase().includes(searchTerm) ||
+                           record.title.toLowerCase().includes(searchTerm) ||
+                           record.description.toLowerCase().includes(searchTerm) ||
+                           record.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+                });
+                
+                renderCards(filtered);
+            });
+        }
+
+        // 筛选功能
+        function setupFilter() {
+            const filterBtn = document.getElementById('filterBtn');
+            let filterVisible = false;
+            
+            filterBtn.addEventListener('click', function() {
+                if (filterVisible) {
+                    removeFilterMenu();
+                    filterVisible = false;
+                    return;
+                }
+                
+                // 创建筛选菜单
+                const filterMenu = document.createElement('div');
+                filterMenu.className = 'filter-menu';
+                filterMenu.style.cssText = `
+                    position: absolute;
+                    background: white;
+                    border-radius: 8px;
+                    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+                    padding: 20px;
+                    z-index: 100;
+                    width: 250px;
+                    margin-top: 10px;
+                `;
+                
+                // 获取按钮位置
+                const btnRect = filterBtn.getBoundingClientRect();
+                filterMenu.style.left = `${btnRect.left}px`;
+                filterMenu.style.top = `${btnRect.bottom}px`;
+                
+                filterMenu.innerHTML = `
+                    <h3 style="margin-bottom: 15px; color: #2c3e50;">筛选记录</h3>
+                    <div style="margin-bottom: 15px;">
+                        <p style="font-weight: 600; margin-bottom: 8px; color: #495057;">按状态筛选</p>
+                        <label style="display: flex; align-items: center; margin-bottom: 8px; cursor: pointer;">
+                            <input type="checkbox" class="status-filter" value="complete" checked style="margin-right: 8px;">
+                            <span>已完成</span>
+                        </label>
+                        <label style="display: flex; align-items: center; margin-bottom: 8px; cursor: pointer;">
+                            <input type="checkbox" class="status-filter" value="progress" checked style="margin-right: 8px;">
+                            <span>进行中</span>
+                        </label>
+                        <label style="display: flex; align-items: center; margin-bottom: 8px; cursor: pointer;">
+                            <input type="checkbox" class="status-filter" value="pending" checked style="margin-right: 8px;">
+                            <span>待处理</span>
+                        </label>
+                    </div>
+                    <div>
+                        <p style="font-weight: 600; margin-bottom: 8px; color: #495057;">按标签筛选</p>
+                        <div class="tag-filters" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            ${Array.from(new Set(records.flatMap(r => r.tags))).map(tag => 
+                                `<label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" class="tag-filter" value="${tag}" checked style="margin-right: 5px;">
+                                    <span class="tag ${tag}">${tag}</span>
+                                </label>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    <button id="applyFilter" style="background-color: #4dabf7; color: white; border: none; padding: 10px 20px; border-radius: 6px; margin-top: 20px; width: 100%; cursor: pointer;">应用筛选</button>
+                `;
+                
+                document.body.appendChild(filterMenu);
+                filterVisible = true;
+                
+                // 应用筛选按钮事件
+                document.getElementById('applyFilter').addEventListener('click', applyFilters);
+                
+                // 点击外部关闭筛选菜单
+                document.addEventListener('click', function closeFilter(e) {
+                    if (!filterMenu.contains(e.target) && e.target !== filterBtn) {
+                        removeFilterMenu();
+                        filterVisible = false;
+                        document.removeEventListener('click', closeFilter);
+                    }
+                });
+            });
+            
+            function removeFilterMenu() {
+                const existingMenu = document.querySelector('.filter-menu');
+                if (existingMenu) {
+                    existingMenu.remove();
+                }
+            }
+            
+            function applyFilters() {
+                // 获取选中的状态
+                const statusCheckboxes = document.querySelectorAll('.status-filter:checked');
+                const selectedStatuses = Array.from(statusCheckboxes).map(cb => cb.value);
+                
+                // 获取选中的标签
+                const tagCheckboxes = document.querySelectorAll('.tag-filter:checked');
+                const selectedTags = Array.from(tagCheckboxes).map(cb => cb.value);
+                
+                // 筛选记录
+                const filtered = records.filter(record => {
+                    // 状态筛选
+                    const statusMatch = selectedStatuses.includes(record.status);
+                    
+                    // 标签筛选 - 记录至少包含一个选中的标签
+                    const tagMatch = selectedTags.length === 0 || 
+                                     record.tags.some(tag => selectedTags.includes(tag));
+                    
+                    return statusMatch && tagMatch;
+                });
+                
+                renderCards(filtered);
+                removeFilterMenu();
+                filterVisible = false;
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCards();
+            setupSearch();
+            setupFilter();
+            
+            // 为相关网站链接添加外部链接标识
+            document.querySelectorAll('.site-item').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.stopPropagation(); // 防止事件冒泡到卡片
+                });
+            });
+        });
+    </script>
+</body>
+</html>
