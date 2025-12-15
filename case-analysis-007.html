@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机器人导航与路径规划 - 案例007</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .case-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .case-id {
+            display: inline-block;
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .case-title {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .case-meta {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .case-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .case-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .tag {
+            background-color: #e5dbff;
+            color: #5f3dc4;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .tag.robot { background-color: #e5dbff; color: #5f3dc4; }
+        .tag.navigation { background-color: #e7f5ff; color: #1971c2; }
+        .tag.ros { background-color: #ffe3e3; color: #c92a2a; }
+        .tag.algorithm { background-color: #d3f9d8; color: #2b8a3e; }
+        
+        .content-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .hint-box {
+            background-color: #e5dbff;
+            border-left: 4px solid #5f3dc4;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+        
+        .hint-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #5f3dc4;
+        }
+        
+        .hint-title i {
+            font-size: 1.2rem;
+        }
+        
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .code-comment { color: #6a9955; }
+        .code-keyword { color: #569cd6; }
+        .code-function { color: #dcdcaa; }
+        .code-string { color: #ce9178; }
+        .code-number { color: #b5cea8; }
+        .code-variable { color: #9cdcfe; }
+        
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .algorithm-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #5f3dc4;
+            transition: all 0.3s;
+        }
+        
+        .algorithm-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .algorithm-card h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .comparison-table th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .comparison-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .visualization {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .viz-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .viz-title {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .analysis-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .analysis-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .analysis-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .list-icon {
+            color: #5f3dc4;
+            font-size: 1.2rem;
+            margin-top: 3px;
+        }
+        
+        .related-cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .related-case {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .related-case:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .related-case h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .demo-btn {
+            padding: 10px 20px;
+            background-color: #4dabf7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .demo-btn:hover {
+            background-color: #1c7ed6;
+        }
+        
+        .demo-btn.secondary {
+            background-color: #5f3dc4;
+        }
+        
+        .demo-btn.secondary:hover {
+            background-color: #4c2f9e;
+        }
+        
+        .demo-canvas {
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            margin: 20px 0;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .case-title {
+                font-size: 1.8rem;
+            }
+            
+            .content-section {
+                padding: 20px;
+            }
+            
+            .related-cases {
+                grid-template-columns: 1fr;
+            }
+            
+            .algorithm-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .visualization {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    返回主页面
+                </a>
+                <div>
+                    <h1>历史记录分析系统</h1>
+                    <p style="opacity: 0.85; margin-top: 5px;">案例详细分析</p>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="case-header">
+            <span class="case-id">REC007</span>
+            <h1 class="case-title">机器人导航与路径规划</h1>
+            <div class="case-meta">
+                <div class="case-meta-item">
+                    <i class="far fa-calendar"></i>
+                    <span>创建日期: 2023-11-15</span>
+                </div>
+                <div class="case-meta-item">
+                    <i class="fas fa-tags"></i>
+                    <span>标签:</span>
+                </div>
+            </div>
+            <div class="case-tags">
+                <span class="tag robot">机器人</span>
+                <span class="tag navigation">导航</span>
+                <span class="tag ros">ROS</span>
+                <span class="tag algorithm">算法</span>
+                <span class="tag">SLAM</span>
+                <span class="tag">A*</span>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <div class="hint-box">
+                <div class="hint-title">
+                    <i class="fas fa-robot"></i>
+                    <h3>案例暗示分析</h3>
+                </div>
+                <p>这个案例分析了移动机器人导航系统的关键技术，包括环境感知、定位、地图构建和路径规划。通过对比不同导航算法的性能，提供了在实际机器人项目中优化导航系统的方法。</p>
+            </div>
+            
+            <h2 class="section-title">机器人导航关键技术</h2>
+            
+            <div class="algorithm-grid">
+                <div class="algorithm-card">
+                    <h4><i class="fas fa-map"></i> SLAM (即时定位与地图构建)</h4>
+                    <p>机器人从未知环境的未知位置开始，在运动过程中通过重复观测到的地图特征定位自身位置和姿态，再根据自身位置增量式构建地图。</p>
+                </div>
+                
+                <div class="algorithm-card">
+                    <h4><i class="fas fa-route"></i> 全局路径规划</h4>
+                    <p>基于已知环境地图，规划从起点到目标点的最优或次优路径。常用算法包括A*、Dijkstra、RRT等。</p>
+                </div>
+                
+                <div class="algorithm-card">
+                    <h4><i class="fas fa-bolt"></i> 局部路径规划</h4>
+                    <p>在机器人运动过程中，根据传感器实时感知的局部环境信息，避开动态障碍物，调整运动轨迹。</p>
+                </div>
+                
+                <div class="algorithm-card">
+                    <h4><i class="fas fa-sync-alt"></i> 运动控制</h4>
+                    <p>将规划出的路径转换为机器人电机的控制指令，实现精确的位置控制和速度控制。</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">路径规划算法对比</h2>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>算法</th>
+                        <th>优点</th>
+                        <th>缺点</th>
+                        <th>适用场景</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>A*算法</strong></td>
+                        <td>路径最优，搜索效率高</td>
+                        <td>需要完整的全局地图</td>
+                        <td>静态环境，已知地图</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dijkstra算法</strong></td>
+                        <td>保证找到最短路径</td>
+                        <td>计算量大，效率较低</td>
+                        <td>小规模图搜索</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RRT (快速随机树)</strong></td>
+                        <td>适合高维空间，实时性好</td>
+                        <td>路径不一定最优</td>
+                        <td>动态环境，高维空间</td>
+                    </tr>
+                    <tr>
+                        <td><strong>人工势场法</strong></td>
+                        <td>实时性好，计算简单</td>
+                        <td>容易陷入局部最小值</td>
+                        <td>简单环境，实时避障</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3 style="margin: 30px 0 15px; color: #495057;">A*算法Python实现示例</h3>
+            <div class="code-block">
+<span class="code-comment"># A*路径规划算法实现</span><br>
+<span class="code-keyword">import</span> heapq<br>
+<span class="code-keyword">import</span> math<br><br>
+
+<span class="code-keyword">class</span> <span class="code-function">Node</span>:<br>
+&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, position, parent=None):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.position = position<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.parent = parent<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.g = <span class="code-number">0</span>  <span class="code-comment"># 从起点到当前节点的实际代价</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.h = <span class="code-number">0</span>  <span class="code-comment"># 从当前节点到目标的预估代价</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.f = <span class="code-number">0</span>  <span class="code-comment"># 总代价 f = g + h</span><br><br>
+
+<span class="code-keyword">def</span> <span class="code-function">astar</span>(grid, start, end):<br>
+&nbsp;&nbsp;<span class="code-comment">"""A*路径规划算法"""</span><br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 创建开始和结束节点</span><br>
+&nbsp;&nbsp;start_node = <span class="code-function">Node</span>(start)<br>
+&nbsp;&nbsp;end_node = <span class="code-function">Node</span>(end)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 初始化开放列表和关闭列表</span><br>
+&nbsp;&nbsp;open_list = []<br>
+&nbsp;&nbsp;closed_list = <span class="code-function">set</span>()<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 将开始节点加入开放列表</span><br>
+&nbsp;&nbsp;heapq.heappush(open_list, (start_node.f, start_node))<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-keyword">while</span> open_list:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 获取当前节点</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;current_node = heapq.heappop(open_list)[<span class="code-number">1</span>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;closed_list.<span class="code-function">add</span>(current_node.position)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 如果找到目标节点，重构路径</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> current_node.position == end_node.position:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;path = []<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;current = current_node<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">while</span> current <span class="code-keyword">is</span> <span class="code-keyword">not</span> None:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;path.<span class="code-function">append</span>(current.position)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;current = current.parent<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> path[::<span class="code-number">-1</span>]  <span class="code-comment"># 反转路径</span><br><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 生成相邻节点</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> new_position <span class="code-keyword">in</span> [(<span class="code-number">0</span>, <span class="code-number">-1</span>), (<span class="code-number">0</span>, <span class="code-number">1</span>), (<span class="code-number">-1</span>, <span class="code-number">0</span>), (<span class="code-number">1</span>, <span class="code-number">0</span>)]:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;node_position = (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;current_node.position[<span class="code-number">0</span>] + new_position[<span class="code-number">0</span>],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;current_node.position[<span class="code-number">1</span>] + new_position[<span class="code-number">1</span>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 确保节点在网格范围内</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;node_position[<span class="code-number">0</span>] &gt; (len(grid) - <span class="code-number">1</span>) <span class="code-keyword">or</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;node_position[<span class="code-number">0</span>] &lt; <span class="code-number">0</span> <span class="code-keyword">or</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;node_position[<span class="code-number">1</span>] &gt; (len(grid[len(grid)-<span class="code-number">1</span>)]) - <span class="code-number">1</span>) <span class="code-keyword">or</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;node_position[<span class="code-number">1</span>] &lt; <span class="code-number">0</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">continue</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 确保节点不是障碍物</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> grid[node_position[<span class="code-number">0</span>]][node_position[<span class="code-number">1</span>]] != <span class="code-number">0</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">continue</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 创建新节点</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new_node = <span class="code-function">Node</span>(node_position, current_node)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 如果节点已在关闭列表中，跳过</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> new_node.position <span class="code-keyword">in</span> closed_list:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">continue</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 计算g、h、f值</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new_node.g = current_node.g + <span class="code-number">1</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new_node.h = math.sqrt(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(new_node.position[<span class="code-number">0</span>] - end_node.position[<span class="code-number">0</span>]) ** <span class="code-number">2</span> +<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(new_node.position[<span class="code-number">1</span>] - end_node.position[<span class="code-number">1</span>]) ** <span class="code-number">2</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new_node.f = new_node.g + new_node.h<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 如果节点已在开放列表中且g值更大，跳过</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> i, (f, node) <span class="code-keyword">in</span> <span class="code-function">enumerate</span>(open_list):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> node.position == new_node.position <span class="code-keyword">and</span> new_node.g &gt; node.g:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">continue</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 将节点加入开放列表</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;heapq.heappush(open_list, (new_node.f, new_node))<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-keyword">return</span> None  <span class="code-comment"># 未找到路径</span>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">交互演示：路径规划可视化</h2>
+            
+            <div class="demo-controls">
+                <button class="demo-btn" id="runAStar">运行A*算法</button>
+                <button class="demo-btn" id="runDijkstra">运行Dijkstra算法</button>
+                <button class="demo-btn secondary" id="resetDemo">重置</button>
+                <button class="demo-btn" id="addObstacle">添加障碍物</button>
+            </div>
+            
+            <div class="demo-canvas" id="pathCanvas">
+                <!-- 路径规划可视化将在这里渲染 -->
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #666; text-align: center;">
+                    <i class="fas fa-robot" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
+                    <p>点击上方按钮运行路径规划算法演示</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                <div style="background-color: #e7f5ff; padding: 15px; border-radius: 6px;">
+                    <div style="font-weight: 600; margin-bottom: 8px; color: #1971c2;">起点</div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 20px; height: 20px; background-color: #2b8a3e; border-radius: 4px;"></div>
+                        <span>绿色方块</span>
+                    </div>
+                </div>
+                <div style="background-color: #ffdeeb; padding: 15px; border-radius: 6px;">
+                    <div style="font-weight: 600; margin-bottom: 8px; color: #a61e4d;">终点</div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 20px; height: 20px; background-color: #c92a2a; border-radius: 4px;"></div>
+                        <span>红色方块</span>
+                    </div>
+                </div>
+                <div style="background-color: #e5dbff; padding: 15px; border-radius: 6px;">
+                    <div style="font-weight: 600; margin-bottom: 8px; color: #5f3dc4;">障碍物</div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 20px; height: 20px; background-color: #495057; border-radius: 4px;"></div>
+                        <span>灰色方块</span>
+                    </div>
+                </div>
+                <div style="background-color: #fff3bf; padding: 15px; border-radius: 6px;">
+                    <div style="font-weight: 600; margin-bottom: 8px; color: #e67700;">路径</div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 20px; height: 20px; background-color: #4dabf7; border-radius: 4px;"></div>
+                        <span>蓝色路径</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">关键发现与最佳实践</h2>
+            
+            <ul class="analysis-list">
+                <li>
+                    <i class="fas fa-map-signs list-icon"></i>
+                    <div>
+                        <strong>分层规划策略</strong>：结合全局路径规划和局部避障，在保证全局最优的同时实现实时避障。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-balance-scale list-icon"></i>
+                    <div>
+                        <strong>算法选择平衡</strong>：在路径最优性和计算效率之间寻找平衡，根据应用场景选择合适的算法。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-sync-alt list-icon"></i>
+                    <div>
+                        <strong>动态环境适应</strong>：使用增量式SLAM和实时路径重规划技术，适应动态变化的环境。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-microchip list-icon"></i>
+                    <div>
+                        <strong>计算资源优化</strong>：针对嵌入式平台优化算法，减少内存占用和计算时间。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-shield-alt list-icon"></i>
+                    <div>
+                        <strong>安全冗余设计</strong>：设计多重安全机制，包括紧急停止、避障优先级和安全边界。
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">相关案例</h2>
+            <div class="related-cases">
+                <a href="case-analysis-008.html" class="related-case">
+                    <h4>机器人视觉处理与OpenCV</h4>
+                    <p>机器人的视觉感知技术</p>
+                </a>
+                <a href="case-analysis-009.html" class="related-case">
+                    <h4>ROS机器人操作系统实战</h4>
+                    <p>机器人开发框架的应用</p>
+                </a>
+                <a href="index.html" class="related-case">
+                    <h4>查看所有案例</h4>
+                    <p>返回主页面浏览完整案例列表</p>
+                </a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>历史记录分析系统 &copy; 2023 | 案例编号: REC007</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 路径规划演示功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('pathCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 网格参数
+            const gridSize = 20;
+            const rows = Math.floor(canvas.height / gridSize);
+            const cols = Math.floor(canvas.width / gridSize);
+            
+            // 初始化网格
+            let grid = [];
+            let start = {x: 2, y: 2};
+            let end = {x: cols - 3, y: rows - 3};
+            let path = [];
+            
+            // 初始化网格
+            function initGrid() {
+                grid = [];
+                for (let i = 0; i < rows; i++) {
+                    grid[i] = [];
+                    for (let j = 0; j < cols; j++) {
+                        // 随机生成一些障碍物
+                        if (Math.random() < 0.2 && 
+                            !(i === start.y && j === start.x) && 
+                            !(i === end.y && j === end.x)) {
+                            grid[i][j] = 1; // 障碍物
+                        } else {
+                            grid[i][j] = 0; // 可通行
+                        }
+                    }
+                }
+                path = [];
+                drawGrid();
+            }
+            
+            // 绘制网格
+            function drawGrid() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 绘制网格线和单元格
+                for (let i = 0; i <= rows; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, i * gridSize);
+                    ctx.lineTo(canvas.width, i * gridSize);
+                    ctx.strokeStyle = '#e0e0e0';
+                    ctx.stroke();
+                }
+                
+                for (let j = 0; j <= cols; j++) {
+                    ctx.beginPath();
+                    ctx.moveTo(j * gridSize, 0);
+                    ctx.lineTo(j * gridSize, canvas.height);
+                    ctx.strokeStyle = '#e0e0e0';
+                    ctx.stroke();
+                }
+                
+                // 绘制障碍物
+                for (let i = 0; i < rows; i++) {
+                    for (let j = 0; j < cols; j++) {
+                        if (grid[i][j] === 1) {
+                            ctx.fillStyle = '#495057';
+                            ctx.fillRect(j * gridSize + 1, i * gridSize + 1, gridSize - 2, gridSize - 2);
+                        }
+                    }
+                }
+                
+                // 绘制起点
+                ctx.fillStyle = '#2b8a3e';
+                ctx.fillRect(start.x * gridSize + 1, start.y * gridSize + 1, gridSize - 2, gridSize - 2);
+                ctx.fillStyle = 'white';
+                ctx.font = '12px Arial';
+                ctx.fillText('S', start.x * gridSize + 6, start.y * gridSize + 15);
+                
+                // 绘制终点
+                ctx.fillStyle = '#c92a2a';
+                ctx.fillRect(end.x * gridSize + 1, end.y * gridSize + 1, gridSize - 2, gridSize - 2);
+                ctx.fillStyle = 'white';
+                ctx.fillText('E', end.x * gridSize + 6, end.y * gridSize + 15);
+                
+                // 绘制路径
+                if (path.length > 0) {
+                    ctx.strokeStyle = '#4dabf7';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    
+                    for (let i = 0; i < path.length; i++) {
+                        const x = path[i].x * gridSize + gridSize / 2;
+                        const y = path[i].y * gridSize + gridSize / 2;
+                        
+                        if (i === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    }
+                    ctx.stroke();
+                    
+                    // 绘制路径节点
+                    for (let i = 0; i < path.length; i++) {
+                        const x = path[i].x * gridSize + gridSize / 2;
+                        const y = path[i].y * gridSize + gridSize / 2;
+                        
+                        ctx.fillStyle = '#4dabf7';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 4, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
+            
+            // A*算法实现
+            function aStar() {
+                // 简化的A*算法演示
+                const openSet = [];
+                const closedSet = [];
+                const cameFrom = new Map();
+                
+                const startKey = `${start.x},${start.y}`;
+                const endKey = `${end.x},${end.y}`;
+                
+                // 启发式函数（曼哈顿距离）
+                function heuristic(a, b) {
+                    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+                }
+                
+                // 初始化
+                openSet.push({
+                    x: start.x,
+                    y: start.y,
+                    f: heuristic(start, end),
+                    g: 0,
+                    h: heuristic(start, end)
+                });
+                
+                // 动画显示搜索过程
+                let animationFrame;
+                let currentStep = 0;
+                
+                function animateSearch() {
+                    if (openSet.length === 0) {
+                        cancelAnimationFrame(animationFrame);
+                        return;
+                    }
+                    
+                    // 获取f值最小的节点
+                    let current = openSet[0];
+                    let currentIndex = 0;
+                    
+                    for (let i = 1; i < openSet.length; i++) {
+                        if (openSet[i].f < current.f) {
+                            current = openSet[i];
+                            currentIndex = i;
+                        }
+                    }
+                    
+                    // 从开放列表中移除当前节点
+                    openSet.splice(currentIndex, 1);
+                    closedSet.push(current);
+                    
+                    // 如果找到终点
+                    if (current.x === end.x && current.y === end.y) {
+                        // 重构路径
+                        path = [];
+                        let temp = current;
+                        while (temp) {
+                            path.unshift({x: temp.x, y: temp.y});
+                            temp = cameFrom.get(`${temp.x},${temp.y}`);
+                        }
+                        
+                        drawGrid();
+                        cancelAnimationFrame(animationFrame);
+                        return;
+                    }
+                    
+                    // 生成相邻节点
+                    const neighbors = [
+                        {x: current.x - 1, y: current.y},
+                        {x: current.x + 1, y: current.y},
+                        {x: current.x, y: current.y - 1},
+                        {x: current.x, y: current.y + 1}
+                    ];
+                    
+                    for (const neighbor of neighbors) {
+                        // 检查边界
+                        if (neighbor.x < 0 || neighbor.x >= cols || neighbor.y < 0 || neighbor.y >= rows) {
+                            continue;
+                        }
+                        
+                        // 检查障碍物
+                        if (grid[neighbor.y][neighbor.x] === 1) {
+                            continue;
+                        }
+                        
+                        // 检查是否在关闭列表中
+                        if (closedSet.some(node => node.x === neighbor.x && node.y === neighbor.y)) {
+                            continue;
+                        }
+                        
+                        // 计算g值
+                        const tentativeG = current.g + 1;
+                        
+                        // 检查是否在开放列表中
+                        const neighborKey = `${neighbor.x},${neighbor.y}`;
+                        let neighborInOpenSet = openSet.find(node => node.x === neighbor.x && node.y === neighbor.y);
+                        
+                        if (!neighborInOpenSet) {
+                            // 新节点
+                            neighborInOpenSet = {
+                                x: neighbor.x,
+                                y: neighbor.y,
+                                f: 0,
+                                g: tentativeG,
+                                h: heuristic(neighbor, end)
+                            };
+                            neighborInOpenSet.f = neighborInOpenSet.g + neighborInOpenSet.h;
+                            openSet.push(neighborInOpenSet);
+                            cameFrom.set(neighborKey, current);
+                        } else if (tentativeG < neighborInOpenSet.g) {
+                            // 找到更好的路径
+                            neighborInOpenSet.g = tentativeG;
+                            neighborInOpenSet.f = neighborInOpenSet.g + neighborInOpenSet.h;
+                            cameFrom.set(neighborKey, current);
+                        }
+                    }
+                    
+                    // 绘制当前搜索状态
+                    drawGrid();
+                    
+                    // 绘制开放列表节点
+                    ctx.fillStyle = 'rgba(77, 171, 247, 0.3)';
+                    for (const node of openSet) {
+                        ctx.fillRect(node.x * gridSize + 1, node.y * gridSize + 1, gridSize - 2, gridSize - 2);
+                    }
+                    
+                    // 绘制关闭列表节点
+                    ctx.fillStyle = 'rgba(233, 236, 239, 0.3)';
+                    for (const node of closedSet) {
+                        ctx.fillRect(node.x * gridSize + 1, node.y * gridSize + 1, gridSize - 2, gridSize - 2);
+                    }
+                    
+                    // 继续动画
+                    currentStep++;
+                    if (currentStep < 1000) { // 防止无限循环
+                        animationFrame = requestAnimationFrame(animateSearch);
+                    }
+                }
+                
+                animationFrame = requestAnimationFrame(animateSearch);
+            }
+            
+            // Dijkstra算法实现（简化版）
+            function dijkstra() {
+                // 简化的Dijkstra算法演示
+                const distances = [];
+                const visited = [];
+                const previous = [];
+                
+                // 初始化距离数组
+                for (let i = 0; i < rows; i++) {
+                    distances[i] = [];
+                    visited[i] = [];
+                    previous[i] = [];
+                    for (let j = 0; j < cols; j++) {
+                        distances[i][j] = Infinity;
+                        visited[i][j] = false;
+                        previous[i][j] = null;
+                    }
+                }
+                
+                distances[start.y][start.x] = 0;
+                
+                let animationFrame;
+                let currentStep = 0;
+                
+                function animateDijkstra() {
+                    // 找到未访问节点中距离最小的节点
+                    let minDist = Infinity;
+                    let current = null;
+                    
+                    for (let i = 0; i < rows; i++) {
+                        for (let j = 0; j < cols; j++) {
+                            if (!visited[i][j] && distances[i][j] < minDist && grid[i][j] !== 1) {
+                                minDist = distances[i][j];
+                                current = {x: j, y: i};
+                            }
+                        }
+                    }
+                    
+                    if (!current) {
+                        cancelAnimationFrame(animationFrame);
+                        return;
+                    }
+                    
+                    visited[current.y][current.x] = true;
+                    
+                    // 如果到达终点
+                    if (current.x === end.x && current.y === end.y) {
+                        // 重构路径
+                        path = [];
+                        let temp = current;
+                        while (temp) {
+                            path.unshift({x: temp.x, y: temp.y});
+                            temp = previous[temp.y][temp.x];
+                        }
+                        
+                        drawGrid();
+                        cancelAnimationFrame(animationFrame);
+                        return;
+                    }
+                    
+                    // 更新相邻节点距离
+                    const neighbors = [
+                        {x: current.x - 1, y: current.y},
+                        {x: current.x + 1, y: current.y},
+                        {x: current.x, y: current.y - 1},
+                        {x: current.x, y: current.y + 1}
+                    ];
+                    
+                    for (const neighbor of neighbors) {
+                        // 检查边界和障碍物
+                        if (neighbor.x < 0 || neighbor.x >= cols || 
+                            neighbor.y < 0 || neighbor.y >= rows ||
+                            grid[neighbor.y][neighbor.x] === 1) {
+                            continue;
+                        }
+                        
+                        const alt = distances[current.y][current.x] + 1;
+                        if (alt < distances[neighbor.y][neighbor.x]) {
+                            distances[neighbor.y][neighbor.x] = alt;
+                            previous[neighbor.y][neighbor.x] = {x: current.x, y: current.y};
+                        }
+                    }
+                    
+                    // 绘制当前搜索状态
+                    drawGrid();
+                    
+                    // 绘制已访问节点
+                    ctx.fillStyle = 'rgba(233, 236, 239, 0.3)';
+                    for (let i = 0; i < rows; i++) {
+                        for (let j = 0; j < cols; j++) {
+                            if (visited[i][j]) {
+                                ctx.fillRect(j * gridSize + 1, i * gridSize + 1, gridSize - 2, gridSize - 2);
+                            }
+                        }
+                    }
+                    
+                    currentStep++;
+                    if (currentStep < 500) {
+                        animationFrame = requestAnimationFrame(animateDijkstra);
+                    }
+                }
+                
+                animationFrame = requestAnimationFrame(animateDijkstra);
+            }
+            
+            // 添加障碍物
+            document.getElementById('addObstacle').addEventListener('click', function() {
+                // 随机添加障碍物
+                const x = Math.floor(Math.random() * cols);
+                const y = Math.floor(Math.random() * rows);
+                
+                // 确保不是起点或终点
+                if (!(x === start.x && y === start.y) && !(x === end.x && y === end.y)) {
+                    grid[y][x] = 1;
+                    drawGrid();
+                }
+            });
+            
+            // 按钮事件
+            document.getElementById('runAStar').addEventListener('click', aStar);
+            document.getElementById('runDijkstra').addEventListener('click', dijkstra);
+            document.getElementById('resetDemo').addEventListener('click', function() {
+                initGrid();
+            });
+            
+            // 初始化
+            initGrid();
+            console.log('案例页面加载完成: 机器人导航与路径规划');
+        });
+    </script>
+</body>
+</html>
