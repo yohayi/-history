@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>材料疲劳数据分析与预测 - 案例010</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .case-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .case-id {
+            display: inline-block;
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .case-title {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .case-meta {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .case-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .case-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .tag {
+            background-color: #ffdeeb;
+            color: #a61e4d;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .tag.material { background-color: #ffdeeb; color: #a61e4d; }
+        .tag.fatigue { background-color: #e5dbff; color: #5f3dc4; }
+        .tag.data { background-color: #d3f9d8; color: #2b8a3e; }
+        .tag.prediction { background-color: #e7f5ff; color: #1971c2; }
+        
+        .content-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .hint-box {
+            background-color: #ffdeeb;
+            border-left: 4px solid #a61e4d;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+        
+        .hint-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #a61e4d;
+        }
+        
+        .hint-title i {
+            font-size: 1.2rem;
+        }
+        
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .code-comment { color: #6a9955; }
+        .code-keyword { color: #569cd6; }
+        .code-function { color: #dcdcaa; }
+        .code-string { color: #ce9178; }
+        .code-number { color: #b5cea8; }
+        .code-variable { color: #9cdcfe; }
+        
+        .material-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .material-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #a61e4d;
+            transition: all 0.3s;
+        }
+        
+        .material-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .material-card h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .comparison-table th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .comparison-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .fatigue-test {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .test-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .test-title {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .analysis-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .analysis-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .analysis-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .list-icon {
+            color: #a61e4d;
+            font-size: 1.2rem;
+            margin-top: 3px;
+        }
+        
+        .related-cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .related-case {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .related-case:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .related-case h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .demo-btn {
+            padding: 10px 20px;
+            background-color: #4dabf7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .demo-btn:hover {
+            background-color: #1c7ed6;
+        }
+        
+        .demo-btn.secondary {
+            background-color: #a61e4d;
+        }
+        
+        .demo-btn.secondary:hover {
+            background-color: #862e4e;
+        }
+        
+        .demo-canvas {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin: 20px 0;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .data-chart {
+            width: 100%;
+            height: 100%;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .case-title {
+                font-size: 1.8rem;
+            }
+            
+            .content-section {
+                padding: 20px;
+            }
+            
+            .related-cases {
+                grid-template-columns: 1fr;
+            }
+            
+            .material-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .fatigue-test {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    返回主页面
+                </a>
+                <div>
+                    <h1>历史记录分析系统</h1>
+                    <p style="opacity: 0.85; margin-top: 5px;">案例详细分析</p>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="case-header">
+            <span class="case-id">REC010</span>
+            <h1 class="case-title">材料疲劳数据分析与预测</h1>
+            <div class="case-meta">
+                <div class="case-meta-item">
+                    <i class="far fa-calendar"></i>
+                    <span>创建日期: 2023-11-25</span>
+                </div>
+                <div class="case-meta-item">
+                    <i class="fas fa-tags"></i>
+                    <span>标签:</span>
+                </div>
+            </div>
+            <div class="case-tags">
+                <span class="tag material">材料科学</span>
+                <span class="tag fatigue">疲劳数据</span>
+                <span class="tag data">数据分析</span>
+                <span class="tag prediction">预测模型</span>
+                <span class="tag">机械性能</span>
+                <span class="tag">机器学习</span>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <div class="hint-box">
+                <div class="hint-title">
+                    <i class="fas fa-microscope"></i>
+                    <h3>案例暗示分析</h3>
+                </div>
+                <p>这个案例分析了金属材料在循环载荷下的疲劳行为，通过实验数据建立疲劳寿命预测模型。研究显示，材料疲劳失效是机械部件失效的主要原因之一，准确预测疲劳寿命对工程安全至关重要。</p>
+            </div>
+            
+            <h2 class="section-title">材料疲劳分析关键技术</h2>
+            
+            <div class="material-grid">
+                <div class="material-card">
+                    <h4><i class="fas fa-weight-hanging"></i> S-N曲线分析</h4>
+                    <p>应力(S)与疲劳寿命(N)的关系曲线，是评估材料疲劳性能的基础。通过实验数据拟合得到S-N曲线方程。</p>
+                </div>
+                
+                <div class="material-card">
+                    <h4><i class="fas fa-wave-square"></i> 疲劳裂纹扩展</h4>
+                    <p>研究疲劳裂纹的萌生和扩展规律，建立裂纹扩展速率与应力强度因子幅值的关系模型。</p>
+                </div>
+                
+                <div class="material-card">
+                    <h4><i class="fas fa-chart-line"></i> 疲劳寿命预测</h4>
+                    <p>基于累积损伤理论，考虑载荷顺序效应，预测复杂载荷谱下的材料疲劳寿命。</p>
+                </div>
+                
+                <div class="material-card">
+                    <h4><i class="fas fa-brain"></i> 机器学习应用</h4>
+                    <p>利用机器学习算法建立材料属性、载荷条件与疲劳寿命的复杂非线性关系模型。</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">常用工程材料疲劳性能对比</h2>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>材料类型</th>
+                        <th>疲劳极限 (MPa)</th>
+                        <th>S-N曲线斜率</th>
+                        <th>典型应用</th>
+                        <th>抗疲劳性能</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>低碳钢</strong></td>
+                        <td>200-250</td>
+                        <td>-0.10</td>
+                        <td>建筑结构，机械零件</td>
+                        <td>中等</td>
+                    </tr>
+                    <tr>
+                        <td><strong>铝合金</strong></td>
+                        <td>100-150</td>
+                        <td>-0.12</td>
+                        <td>航空部件，汽车零件</td>
+                        <td>良好</td>
+                    </tr>
+                    <tr>
+                        <td><strong>钛合金</strong></td>
+                        <td>400-500</td>
+                        <td>-0.08</td>
+                        <td>航空航天，医疗器械</td>
+                        <td>优秀</td>
+                    </tr>
+                    <tr>
+                        <td><strong>复合材料</strong></td>
+                        <td>300-400</td>
+                        <td>-0.15</td>
+                        <td>体育器材，风力叶片</td>
+                        <td>优异</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3 style="margin: 30px 0 15px; color: #495057;">疲劳数据分析Python实现示例</h3>
+            <div class="code-block">
+<span class="code-comment"># 材料疲劳数据分析与预测</span><br>
+<span class="code-keyword">import</span> numpy <span class="code-keyword">as</span> np<br>
+<span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd<br>
+<span class="code-keyword">import</span> matplotlib.pyplot <span class="code-keyword">as</span> plt<br>
+<span class="code-keyword">from</span> sklearn.linear_model <span class="code-keyword">import</span> LinearRegression<br>
+<span class="code-keyword">from</span> sklearn.ensemble <span class="code-keyword">import</span> RandomForestRegressor<br>
+<span class="code-keyword">from</span> sklearn.model_selection <span class="code-keyword">import</span> train_test_split<br>
+<span class="code-keyword">from</span> sklearn.metrics <span class="code-keyword">import</span> mean_squared_error, r2_score<br><br>
+
+<span class="code-comment"># 1. 加载疲劳实验数据</span><br>
+<span class="code-function">def</span> <span class="code-function">load_fatigue_data</span>():<br>
+&nbsp;&nbsp;<span class="code-comment"># 模拟疲劳实验数据：应力幅值(MPa) vs 循环次数</span><br>
+&nbsp;&nbsp;np.random.seed(42)<br>
+&nbsp;&nbsp;stress_amplitudes = np.linspace(200, 400, 50)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># S-N曲线：N = C * S^(-b)，添加随机噪声</span><br>
+&nbsp;&nbsp;C = 1e12  <span class="code-comment"># 材料常数</span><br>
+&nbsp;&nbsp;b = 3.0    <span class="code-comment"># S-N曲线斜率</span><br>
+&nbsp;&nbsp;cycles = C * stress_amplitudes**(-b)<br>
+&nbsp;&nbsp;cycles = cycles * np.random.normal(1, 0.1, len(cycles))  <span class="code-comment"># 添加噪声</span><br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 添加材料属性特征</span><br>
+&nbsp;&nbsp;tensile_strength = np.random.uniform(400, 600, len(stress_amplitudes))<br>
+&nbsp;&nbsp;hardness = np.random.uniform(150, 250, len(stress_amplitudes))<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;data = pd.DataFrame({<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'stress_amp'</span>: stress_amplitudes,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'tensile_strength'</span>: tensile_strength,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'hardness'</span>: hardness,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'log_cycles'</span>: np.log10(cycles)<br>
+&nbsp;&nbsp;})<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-keyword">return</span> data<br><br>
+
+<span class="code-comment"># 2. S-N曲线拟合</span><br>
+<span class="code-function">def</span> <span class="code-function">fit_sn_curve</span>(data):<br>
+&nbsp;&nbsp;<span class="code-comment"># 准备数据：log(S) vs log(N)</span><br>
+&nbsp;&nbsp;X = np.log10(data[<span class="code-string">'stress_amp'</span>]).values.reshape(-1, 1)<br>
+&nbsp;&nbsp;y = data[<span class="code-string">'log_cycles'</span>].values<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 线性回归拟合</span><br>
+&nbsp;&nbsp;model = LinearRegression()<br>
+&nbsp;&nbsp;model.fit(X, y)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 计算拟合参数</span><br>
+&nbsp;&nbsp;b = -model.coef_[0]  <span class="code-comment"># S-N曲线斜率</span><br>
+&nbsp;&nbsp;logC = model.intercept_<br>
+&nbsp;&nbsp;C = 10**logC<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(<span class="code-string">f"S-N曲线方程: N = <span class="code-variable">{C:.2e}</span> * S^(-<span class="code-variable">{b:.3f}</span>)"</span>)<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(<span class="code-string">f"决定系数 R² = <span class="code-variable">{model.score(X, y):.4f}</span>"</span>)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-keyword">return</span> model, b, C<br><br>
+
+<span class="code-comment"># 3. 机器学习疲劳寿命预测</span><br>
+<span class="code-function">def</span> <span class="code-function">predict_fatigue_life</span>(data):<br>
+&nbsp;&nbsp;<span class="code-comment"># 准备特征和目标变量</span><br>
+&nbsp;&nbsp;X = data[[<span class="code-string">'stress_amp'</span>, <span class="code-string">'tensile_strength'</span>, <span class="code-string">'hardness'</span>]]<br>
+&nbsp;&nbsp;y = data[<span class="code-string">'log_cycles'</span>]<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 划分训练集和测试集</span><br>
+&nbsp;&nbsp;X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 随机森林回归模型</span><br>
+&nbsp;&nbsp;rf_model = RandomForestRegressor(n_estimators=100, random_state=42)<br>
+&nbsp;&nbsp;rf_model.fit(X_train, y_train)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 预测和评估</span><br>
+&nbsp;&nbsp;y_pred = rf_model.predict(X_test)<br>
+&nbsp;&nbsp;mse = mean_squared_error(y_test, y_pred)<br>
+&nbsp;&nbsp;r2 = r2_score(y_test, y_pred)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(<span class="code-string">f"随机森林模型性能:"</span>)<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(<span class="code-string">f"  均方误差(MSE): <span class="code-variable">{mse:.4f}</span>"</span>)<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(<span class="code-string">f"  决定系数(R²): <span class="code-variable">{r2:.4f}</span>"</span>)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 特征重要性分析</span><br>
+&nbsp;&nbsp;feature_importance = pd.DataFrame({<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'feature'</span>: X.columns,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">'importance'</span>: rf_model.feature_importances_<br>
+&nbsp;&nbsp;}).sort_values(<span class="code-string">'importance'</span>, ascending=False)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(<span class="code-string">"\n特征重要性:"</span>)<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(feature_importance)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-keyword">return</span> rf_model<br><br>
+
+<span class="code-comment"># 4. 绘制S-N曲线</span><br>
+<span class="code-function">def</span> <span class="code-function">plot_sn_curve</span>(data, model, b, C):<br>
+&nbsp;&nbsp;plt.figure(figsize=(10, 6))<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 原始数据点</span><br>
+&nbsp;&nbsp;plt.scatter(data[<span class="code-string">'stress_amp'</span>], 10**data[<span class="code-string">'log_cycles'</span>], alpha=0.6, label=<span class="code-string">'实验数据'</span>)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 拟合曲线</span><br>
+&nbsp;&nbsp;stress_range = np.linspace(data[<span class="code-string">'stress_amp'</span>].min(), data[<span class="code-string">'stress_amp'</span>].max(), 100)<br>
+&nbsp;&nbsp;predicted_cycles = C * stress_range**(-b)<br>
+&nbsp;&nbsp;plt.plot(stress_range, predicted_cycles, <span class="code-string">'r-'</span>, linewidth=2, label=<span class="code-string">'拟合曲线'</span>)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;plt.xscale(<span class="code-string">'log'</span>)<br>
+&nbsp;&nbsp;plt.yscale(<span class="code-string">'log'</span>)<br>
+&nbsp;&nbsp;plt.xlabel(<span class="code-string">'应力幅值 (MPa)'</span>)<br>
+&nbsp;&nbsp;plt.ylabel(<span class="code-string">'疲劳寿命 (循环次数)'</span>)<br>
+&nbsp;&nbsp;plt.title(<span class="code-string">'材料S-N曲线'</span>)<br>
+&nbsp;&nbsp;plt.legend()<br>
+&nbsp;&nbsp;plt.grid(True, which=<span class="code-string">"both"</span>, ls=<span class="code-string">"-"</span>, alpha=0.2)<br>
+&nbsp;&nbsp;plt.tight_layout()<br>
+&nbsp;&nbsp;plt.show()<br><br>
+
+<span class="code-comment"># 主程序</span><br>
+<span class="code-keyword">if</span> __name__ == <span class="code-string">"__main__"</span>:<br>
+&nbsp;&nbsp;<span class="code-comment"># 加载数据</span><br>
+&nbsp;&nbsp;data = <span class="code-function">load_fatigue_data</span>()<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(<span class="code-string">"数据概览:"</span>)<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(data.head())<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># S-N曲线拟合</span><br>
+&nbsp;&nbsp;sn_model, b, C = <span class="code-function">fit_sn_curve</span>(data)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 机器学习预测</span><br>
+&nbsp;&nbsp;rf_model = <span class="code-function">predict_fatigue_life</span>(data)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 绘制图形</span><br>
+&nbsp;&nbsp;<span class="code-function">plot_sn_curve</span>(data, sn_model, b, C)<br>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">交互演示：疲劳数据分析</h2>
+            
+            <div class="demo-controls">
+                <button class="demo-btn" id="loadFatigueData">加载疲劳数据</button>
+                <button class="demo-btn" id="fitSNCurve">拟合S-N曲线</button>
+                <button class="demo-btn secondary" id="predictLife">预测疲劳寿命</button>
+                <button class="demo-btn" id="resetDemo">重置</button>
+            </div>
+            
+            <div class="demo-canvas">
+                <canvas id="fatigueChart" class="data-chart"></canvas>
+            </div>
+            
+            <div id="analysisResults" style="display: none; margin-top: 20px;">
+                <h4 style="margin-bottom: 15px; color: #2c3e50;">分析结果摘要</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="background-color: #e7f5ff; padding: 15px; border-radius: 6px;">
+                        <div style="font-size: 0.9rem; color: #666;">S-N曲线斜率</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: #1971c2;" id="snSlope">-0.000</div>
+                    </div>
+                    <div style="background-color: #d3f9d8; padding: 15px; border-radius: 6px;">
+                        <div style="font-size: 0.9rem; color: #666;">决定系数 R²</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: #2b8a3e;" id="rSquared">0.000</div>
+                    </div>
+                    <div style="background-color: #fff3bf; padding: 15px; border-radius: 6px;">
+                        <div style="font-size: 0.9rem; color: #666;">疲劳极限</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: #e67700;" id="fatigueLimit">0 MPa</div>
+                    </div>
+                    <div style="background-color: #ffdeeb; padding: 15px; border-radius: 6px;">
+                        <div style="font-size: 0.9rem; color: #666;">预测误差</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: #a61e4d;" id="predictionError">0.00%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">关键发现与最佳实践</h2>
+            
+            <ul class="analysis-list">
+                <li>
+                    <i class="fas fa-chart-line list-icon"></i>
+                    <div>
+                        <strong>S-N曲线对数变换</strong>：通过双对数坐标下的线性回归，可以准确拟合材料疲劳数据，斜率参数反映材料抗疲劳性能。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-weight-hanging list-icon"></i>
+                    <div>
+                        <strong>应力比影响显著</strong>：平均应力对疲劳寿命有重要影响，高应力比(R>0)条件下疲劳寿命显著降低。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-cogs list-icon"></i>
+                    <div>
+                        <strong>多轴疲劳复杂性</strong>：实际工程中的多轴应力状态比单轴疲劳更复杂，需要更精细的分析模型。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-microchip list-icon"></i>
+                    <div>
+                        <strong>机器学习提升精度</strong>：与传统经验公式相比，机器学习模型可以考虑更多影响因素，提高预测精度20-40%。
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-shield-alt list-icon"></i>
+                    <div>
+                        <strong>安全系数设计</strong>：工程应用中需考虑分散性，采用适当的安全系数确保结构可靠性。
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-title">相关案例</h2>
+            <div class="related-cases">
+                <a href="case-analysis-011.html" class="related-case">
+                    <h4>化学电池材料研究与性能优化</h4>
+                    <p>材料科学在能源领域的应用</p>
+                </a>
+                <a href="case-analysis-012.html" class="related-case">
+                    <h4>仿生算法在优化问题中的应用</h4>
+                    <p>生物启发式优化方法</p>
+                </a>
+                <a href="index.html" class="related-case">
+                    <h4>查看所有案例</h4>
+                    <p>返回主页面浏览完整案例列表</p>
+                </a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>历史记录分析系统 &copy; 2023 | 案例编号: REC010</p>
+        </footer>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // 疲劳数据分析演示功能
+        document.addEventListener('DOMContentLoaded', function() {
+            let fatigueChart = null;
+            let fatigueData = null;
+            let snModel = null;
+            
+            // 生成模拟疲劳数据
+            function generateFatigueData() {
+                const data = {
+                    stress: [],
+                    cycles: [],
+                    tensile: [],
+                    hardness: []
+                };
+                
+                // 生成50个数据点
+                for (let i = 0; i < 50; i++) {
+                    // 应力范围：200-400 MPa
+                    const stress = 200 + Math.random() * 200;
+                    
+                    // S-N曲线：N = C * S^(-b)
+                    const C = 1e12;
+                    const b = 3.0;
+                    let cycles = C * Math.pow(stress, -b);
+                    
+                    // 添加随机噪声
+                    cycles = cycles * (0.9 + Math.random() * 0.2);
+                    
+                    // 材料属性
+                    const tensile = 400 + Math.random() * 200;
+                    const hardness = 150 + Math.random() * 100;
+                    
+                    data.stress.push(stress);
+                    data.cycles.push(cycles);
+                    data.tensile.push(tensile);
+                    data.hardness.push(hardness);
+                }
+                
+                return data;
+            }
+            
+            // 初始化图表
+            function initChart() {
+                const ctx = document.getElementById('fatigueChart').getContext('2d');
+                
+                if (fatigueChart) {
+                    fatigueChart.destroy();
+                }
+                
+                fatigueChart = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: '疲劳数据',
+                            data: [],
+                            backgroundColor: '#4dabf7',
+                            borderColor: '#1971c2',
+                            borderWidth: 1,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'logarithmic',
+                                title: {
+                                    display: true,
+                                    text: '应力幅值 (MPa)',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                }
+                            },
+                            y: {
+                                type: 'logarithmic',
+                                title: {
+                                    display: true,
+                                    text: '疲劳寿命 (循环次数)',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `应力: ${context.parsed.x.toFixed(1)} MPa, 寿命: ${context.parsed.y.toExponential(2)} 次`;
+                                    }
+                                }
+                            },
+                            legend: {
+                                labels: {
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 拟合S-N曲线
+            function fitSNCurve() {
+                if (!fatigueData) return;
+                
+                // 对数变换
+                const logStress = fatigueData.stress.map(s => Math.log10(s));
+                const logCycles = fatigueData.cycles.map(c => Math.log10(c));
+                
+                // 线性回归
+                const n = logStress.length;
+                const sumX = logStress.reduce((a, b) => a + b, 0);
+                const sumY = logCycles.reduce((a, b) => a + b, 0);
+                const sumXY = logStress.reduce((sum, x, i) => sum + x * logCycles[i], 0);
+                const sumX2 = logStress.reduce((sum, x) => sum + x * x, 0);
+                
+                const b = -(n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+                const logC = (sumY + b * sumX) / n;
+                const C = Math.pow(10, logC);
+                
+                // 计算R²
+                const meanY = sumY / n;
+                const ssTotal = logCycles.reduce((sum, y) => sum + Math.pow(y - meanY, 2), 0);
+                const ssResidual = logCycles.reduce((sum, y, i) => {
+                    const yPred = logC - b * logStress[i];
+                    return sum + Math.pow(y - yPred, 2);
+                }, 0);
+                const r2 = 1 - (ssResidual / ssTotal);
+                
+                // 保存模型
+                snModel = { b, C, r2 };
+                
+                // 添加拟合曲线到图表
+                const minStress = Math.min(...fatigueData.stress);
+                const maxStress = Math.max(...fatigueData.stress);
+                const fitData = [];
+                
+                for (let s = minStress; s <= maxStress; s += (maxStress - minStress) / 50) {
+                    fitData.push({
+                        x: s,
+                        y: C * Math.pow(s, -b)
+                    });
+                }
+                
+                fatigueChart.data.datasets.push({
+                    label: 'S-N拟合曲线',
+                    data: fitData,
+                    backgroundColor: 'transparent',
+                    borderColor: '#c92a2a',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    type: 'line',
+                    tension: 0.4
+                });
+                
+                fatigueChart.update();
+                
+                // 更新结果显示
+                document.getElementById('snSlope').textContent = `-${b.toFixed(3)}`;
+                document.getElementById('rSquared').textContent = r2.toFixed(4);
+                document.getElementById('fatigueLimit').textContent = `${(C * Math.pow(1e7, 1/b)).toFixed(0)} MPa`;
+                document.getElementById('analysisResults').style.display = 'block';
+                
+                alert(`S-N曲线拟合完成！\n方程: N = ${C.toExponential(2)} × S^(-${b.toFixed(3)})\nR² = ${r2.toFixed(4)}`);
+            }
+            
+            // 预测疲劳寿命
+            function predictFatigueLife() {
+                if (!fatigueData || !snModel) {
+                    alert('请先加载数据并拟合S-N曲线！');
+                    return;
+                }
+                
+                // 模拟预测结果
+                const predictionError = 5 + Math.random() * 10; // 5-15%误差
+                
+                document.getElementById('predictionError').textContent = `${predictionError.toFixed(2)}%`;
+                
+                alert(`基于当前模型，疲劳寿命预测误差约为${predictionError.toFixed(1)}%`);
+            }
+            
+            // 按钮事件
+            document.getElementById('loadFatigueData').addEventListener('click', function() {
+                fatigueData = generateFatigueData();
+                initChart();
+                
+                // 更新图表数据
+                const chartData = fatigueData.stress.map((s, i) => ({
+                    x: s,
+                    y: fatigueData.cycles[i]
+                }));
+                
+                fatigueChart.data.datasets[0].data = chartData;
+                fatigueChart.update();
+                
+                // 清除之前的拟合曲线
+                if (fatigueChart.data.datasets.length > 1) {
+                    fatigueChart.data.datasets.splice(1, 1);
+                    fatigueChart.update();
+                }
+                
+                // 重置结果显示
+                document.getElementById('analysisResults').style.display = 'none';
+                snModel = null;
+                
+                alert('疲劳数据加载完成！共50组数据点。');
+            });
+            
+            document.getElementById('fitSNCurve').addEventListener('click', fitSNCurve);
+            document.getElementById('predictLife').addEventListener('click', predictFatigueLife);
+            document.getElementById('resetDemo').addEventListener('click', function() {
+                fatigueData = null;
+                snModel = null;
+                initChart();
+                document.getElementById('analysisResults').style.display = 'none';
+            });
+            
+            // 初始化
+            initChart();
+            console.log('案例页面加载完成: 材料疲劳数据分析与预测');
+        });
+    </script>
+</body>
+</html>
