@@ -1,0 +1,95 @@
+<!-- case-analysis-008.html 文件结构类似，内容聚焦机器人视觉处理 -->
+<!-- 完整代码结构请参考007，以下为关键差异部分 -->
+
+<div class="case-header">
+    <span class="case-id">REC008</span>
+    <h1 class="case-title">机器人视觉处理与OpenCV</h1>
+    <div class="case-meta">
+        <div class="case-meta-item">
+            <i class="far fa-calendar"></i>
+            <span>创建日期: 2023-11-18</span>
+        </div>
+        <!-- 其他元数据 -->
+    </div>
+    <div class="case-tags">
+        <span class="tag robot">机器人</span>
+        <span class="tag vision">视觉</span>
+        <span class="tag opencv">OpenCV</span>
+        <span class="tag python">Python</span>
+        <span class="tag">图像处理</span>
+        <span class="tag">目标检测</span>
+    </div>
+</div>
+
+<!-- 内容部分聚焦计算机视觉技术 -->
+<div class="content-section">
+    <div class="hint-box">
+        <div class="hint-title">
+            <i class="fas fa-eye"></i>
+            <h3>案例暗示分析</h3>
+        </div>
+        <p>这个案例深入探讨机器人视觉系统的核心技术，包括图像采集、预处理、特征提取和目标识别。通过OpenCV库的实践应用，展示了如何为机器人构建高效的视觉感知系统。</p>
+    </div>
+    
+    <h2 class="section-title">机器人视觉处理流程</h2>
+    
+    <div class="algorithm-grid">
+        <div class="algorithm-card">
+            <h4><i class="fas fa-camera"></i> 图像采集</h4>
+            <p>使用摄像头采集环境图像，考虑光照条件、分辨率、帧率对视觉系统的影响。</p>
+        </div>
+        
+        <div class="algorithm-card">
+            <h4><i class="fas fa-filter"></i> 图像预处理</h4>
+            <p>包括去噪、对比度增强、色彩空间转换等，为后续处理准备高质量的图像数据。</p>
+        </div>
+        
+        <div class="algorithm-card">
+            <h4><i class="fas fa-search"></i> 特征提取</h4>
+            <p>提取图像中的关键特征，如边缘、角点、纹理等，用于物体识别和场景理解。</p>
+        </div>
+        
+        <div class="algorithm-card">
+            <h4><i class="fas fa-object-group"></i> 目标识别</h4>
+            <p>使用机器学习或深度学习算法识别图像中的特定物体，为机器人提供环境信息。</p>
+        </div>
+    </div>
+</div>
+
+<!-- OpenCV代码示例部分 -->
+<div class="content-section">
+    <h2 class="section-title">OpenCV核心功能示例</h2>
+    
+    <div class="code-block">
+<span class="code-comment"># OpenCV图像处理基础示例</span><br>
+<span class="code-keyword">import</span> cv2<br>
+<span class="code-keyword">import</span> numpy <span class="code-keyword">as</span> np<br><br>
+
+<span class="code-comment"># 1. 读取和显示图像</span><br>
+img = cv2.imread(<span class="code-string">'robot_environment.jpg'</span>)<br>
+cv2.imshow(<span class="code-string">'原始图像'</span>, img)<br><br>
+
+<span class="code-comment"># 2. 转换为灰度图</span><br>
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)<br><br>
+
+<span class="code-comment"># 3. 边缘检测（Canny算法）</span><br>
+edges = cv2.Canny(gray, threshold1=50, threshold2=150)<br><br>
+
+<span class="code-comment"># 4. 轮廓检测</span><br>
+contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)<br>
+cv2.drawContours(img, contours, -1, (0, 255, 0), 2)<br><br>
+
+<span class="code-comment"># 5. 人脸检测示例（使用Haar级联分类器）</span><br>
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + <span class="code-string">'haarcascade_frontalface_default.xml'</span>)<br>
+faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)<br>
+<span class="code-keyword">for</span> (x, y, w, h) <span class="code-keyword">in</span> faces:<br>
+&nbsp;&nbsp;cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)<br><br>
+
+<span class="code-comment"># 6. 显示处理结果</span><br>
+cv2.imshow(<span class="code-string">'处理结果'</span>, img)<br>
+cv2.waitKey(0)<br>
+cv2.destroyAllWindows()<br>
+    </div>
+</div>
+
+<!-- 更多内容：目标跟踪、特征匹配、相机标定等 -->
