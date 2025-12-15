@@ -427,6 +427,51 @@
     </style>
 </head>
 <body>
+    <!-- ===== 可编辑链接工具栏 ===== -->
+<div id="link-bar">
+    <!-- 工具栏头部：显示和编辑切换 -->
+    <div class="link-bar-header">
+        <span>🔗 快捷链接</span>
+        <button id="toggle-edit-btn" title="编辑链接">✎</button>
+    </div>
+    
+    <!-- 链接展示区 -->
+    <div class="links-container" id="links-display">
+        <!-- 链接会在这里动态生成 -->
+    </div>
+    
+    <!-- 链接编辑区 (默认隐藏) -->
+    <div class="edit-container" id="links-edit" style="display: none;">
+        <textarea id="links-input" placeholder="在这里添加或编辑链接，格式为：
+名称1 | https://example.com
+名称2 | https://another.com
+每条链接占一行，名称和网址用“ | ”分隔。"></textarea>
+        <div class="edit-actions">
+            <button id="save-links-btn">💾 保存</button>
+            <button id="cancel-edit-btn">❌ 取消</button>
+            <button id="reset-links-btn" title="恢复默认">🔄 重置</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 链接工具栏的核心逻辑
+    (function() {
+        // 存储键和默认链接
+        const STORAGE_KEY = 'yohayi_quick_links';
+        const DEFAULT_LINKS = [
+            { name: '几何字符串映射', url: 'https://github.com/yohayi/geometry-string-map' },
+            { name: '研究项目集', url: 'https://github.com/yohayi/2025-2026-' },
+            { name: 'B站主页', url: 'https://space.bilibili.com/1998115340' }
+            { name: ' 信技化生-技术交流网站', url: 'https://yohayi.github.io/-history/' },
+{ name: '“惊鸿斋”官方网站', url: 'https://yohayi.github.io/jinghongzhai--/' },
+{ name: '杭州市教育总结', url: 'https://yohayi.github.io/my-personal-edu-website/' },
+{ name: '教育数据与交流网站', url: 'https://yohayi.github.io/2026--/index.html' },
+{ name: '几何弦理论课后交流-网站', url: 'https://yohayi.github.io/geometry-string-map/' },
+{ name: 'BDCG游戏技术与美术素材网站', url: 'https://yohayi.github.io/BDCG---/' },
+{ name: '游海洋个人网站', url: 'https://yohayi.github.io/yohayi-/' },
+        ];
+        
     <header>
         <div class="container">
             <div class="header-content">
