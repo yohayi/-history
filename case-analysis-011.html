@@ -1,0 +1,184 @@
+<!-- case-analysis-011.html 文件结构类似，内容聚焦化学电池材料 -->
+<!-- 完整代码结构请参考010，以下为关键差异部分 -->
+
+<div class="case-header">
+    <span class="case-id">REC011</span>
+    <h1 class="case-title">化学电池材料研究与性能优化</h1>
+    <div class="case-meta">
+        <div class="case-meta-item">
+            <i class="far fa-calendar"></i>
+            <span>创建日期: 2023-11-28</span>
+        </div>
+        <!-- 其他元数据 -->
+    </div>
+    <div class="case-tags">
+        <span class="tag chemistry">化学材料</span>
+        <span class="tag battery">电池</span>
+        <span class="tag electrochemistry">电化学</span>
+        <span class="tag material">材料科学</span>
+        <span class="tag">锂离子</span>
+        <span class="tag">能量密度</span>
+    </div>
+</div>
+
+<div class="content-section">
+    <div class="hint-box">
+        <div class="hint-title">
+            <i class="fas fa-battery-full"></i>
+            <h3>案例暗示分析</h3>
+        </div>
+        <p>这个案例深入探讨化学电池材料的关键技术，包括正负极材料、电解质和隔膜的研究。通过材料设计和性能优化，提高电池的能量密度、循环寿命和安全性能，推动新能源技术的发展。</p>
+    </div>
+    
+    <h2 class="section-title">电池材料关键技术</h2>
+    
+    <div class="material-grid">
+        <div class="material-card">
+            <h4><i class="fas fa-plus-circle"></i> 正极材料</h4>
+            <p>研究高能量密度的正极材料，如层状氧化物、尖晶石结构和橄榄石结构材料，提高电池电压和容量。</p>
+        </div>
+        
+        <div class="material-card">
+            <h4><i class="fas fa-minus-circle"></i> 负极材料</h4>
+            <p>开发高容量的负极材料，包括石墨、硅基材料和金属氧化物，改善循环稳定性和倍率性能。</p>
+        </div>
+        
+        <div class="material-card">
+            <h4><i class="fas fa-tint"></i> 电解质</h4>
+            <p>研究液态、固态和凝胶电解质，提高离子电导率、电化学稳定性和安全性能。</p>
+        </div>
+        
+        <div class="material-card">
+            <h4><i class="fas fa-filter"></i> 隔膜材料</h4>
+            <p>设计多孔隔膜材料，平衡离子传输和电子绝缘，防止内部短路，提高电池安全性。</p>
+        </div>
+    </div>
+</div>
+
+<div class="content-section">
+    <h2 class="section-title">常见电池类型性能对比</h2>
+    
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>电池类型</th>
+                <th>能量密度 (Wh/kg)</th>
+                <th>循环寿命</th>
+                <th>成本 ($/kWh)</th>
+                <th>主要应用</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>铅酸电池</strong></td>
+                <td>30-50</td>
+                <td>200-300</td>
+                <td>150-200</td>
+                <td>汽车启动，备用电源</td>
+            </tr>
+            <tr>
+                <td><strong>镍氢电池</strong></td>
+                <td>60-120</td>
+                <td>500-1000</td>
+                <td>250-350</td>
+                <td>混合动力汽车，消费电子</td>
+            </tr>
+            <tr>
+                <td><strong>锂离子电池</strong></td>
+                <td>100-265</td>
+                <td>500-2000</td>
+                <td>150-300</td>
+                <td>电动汽车，便携设备</td>
+            </tr>
+            <tr>
+                <td><strong>固态电池</strong></td>
+                <td>250-400</td>
+                <td>1000-5000</td>
+                <td>300-500</td>
+                <td>下一代电动汽车，航空</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="content-section">
+    <h2 class="section-title">锂离子电池电化学模拟</h2>
+    
+    <div class="code-block">
+<span class="code-comment"># 锂离子电池电化学性能模拟</span><br>
+<span class="code-keyword">import</span> numpy <span class="code-keyword">as</span> np<br>
+<span class="code-keyword">import</span> matplotlib.pyplot <span class="code-keyword">as</span> plt<br>
+<span class="code-keyword">from</span> scipy.integrate <span class="code-keyword">import</span> solve_ivp<br><br>
+
+<span class="code-keyword">class</span> <span class="code-function">LithiumIonBattery</span>:<br>
+&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, capacity, internal_resistance, initial_soc=0.5):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.capacity = capacity  <span class="code-comment"># Ah</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.R = internal_resistance  <span class="code-comment"># ohm</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.soc = initial_soc  <span class="code-comment"># State of Charge (0-1)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.voltage = self.<span class="code-function">calculate_voltage</span>()<br><br>
+&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">calculate_voltage</span>(self):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 开路电压与SOC的关系 (模拟NMC电池)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;ocv = 3.0 + 1.2 * self.soc - 0.3 * self.soc**2 + 0.1 * self.soc**3<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> ocv<br><br>
+&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">discharge</span>(self, current, duration):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 恒流放电模拟</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;time_points = np.linspace(0, duration, 100)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results = {<span class="code-string">'time'</span>: [], <span class="code-string">'voltage'</span>: [], <span class="code-string">'soc'</span>: []}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> t <span class="code-keyword">in</span> time_points:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 更新SOC</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;delta_soc = current * t / (self.capacity * 3600)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.soc = max(0, self.soc - delta_soc)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 计算端电压</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ocv = self.<span class="code-function">calculate_voltage</span>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;voltage = ocv - current * self.R<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;results[<span class="code-string">'time'</span>].<span class="code-function">append</span>(t)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;results[<span class="code-string">'voltage'</span>].<span class="code-function">append</span>(voltage)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;results[<span class="code-string">'soc'</span>].<span class="code-function">append</span>(self.soc)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> results<br><br>
+
+<span class="code-comment"># 电池性能测试</span><br>
+<span class="code-keyword">def</span> <span class="code-function">test_battery_performance</span>():<br>
+&nbsp;&nbsp;<span class="code-comment"># 创建电池实例</span><br>
+&nbsp;&nbsp;battery = <span class="code-function">LithiumIonBattery</span>(capacity=3.0, internal_resistance=0.05)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 不同放电倍率测试</span><br>
+&nbsp;&nbsp;discharge_rates = [0.5, 1.0, 2.0, 3.0]  <span class="code-comment"># C-rate</span><br>
+&nbsp;&nbsp;results = []<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;plt.figure(figsize=(12, 8))<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-keyword">for</span> i, rate <span class="code-keyword">in</span> <span class="code-function">enumerate</span>(discharge_rates):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;current = rate * battery.capacity  <span class="code-comment"># A</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;duration = 3600 / rate  <span class="code-comment"># 放电时间 (秒)</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 放电测试</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;battery.soc = 1.0  <span class="code-comment"># 重置为满电状态</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;discharge_data = battery.<span class="code-function">discharge</span>(current, duration)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;results.<span class="code-function">append</span>((rate, discharge_data))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 绘制放电曲线</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.subplot(2, 2, i+1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.plot(discharge_data[<span class="code-string">'time'</span>], discharge_data[<span class="code-string">'voltage'</span>])<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.xlabel(<span class="code-string">'时间 (秒)'</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.ylabel(<span class="code-string">'电压 (V)'</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.title(<span class="code-string">f'<span class="code-variable">{rate}</span>C放电曲线'</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.grid(True)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;plt.tight_layout()<br>
+&nbsp;&nbsp;plt.show()<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 分析放电容量</span><br>
+&nbsp;&nbsp;<span class="code-keyword">for</span> rate, data <span class="code-keyword">in</span> results:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;discharge_capacity = rate * battery.capacity * (data[<span class="code-string">'time'</span>][-1] / 3600)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-function">print</span>(<span class="code-string">f'<span class="code-variable">{rate}</span>C放电: 容量 = <span class="code-variable">{discharge_capacity:.2f}</span>Ah, 平均电压 = <span class="code-variable">{np.mean(data["voltage"]):.2f}</span>V'</span>)<br><br>
+
+<span class="code-keyword">if</span> __name__ == <span class="code-string">"__main__"</span>:<br>
+&nbsp;&nbsp;<span class="code-function">test_battery_performance</span>()<br>
+    </div>
+</div>
+
+<!-- 更多内容：材料表征技术、循环性能测试、热稳定性分析等 -->
