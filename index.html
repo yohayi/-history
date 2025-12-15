@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>历史记录分析系统</title>
+    <title>历史记录分析系统 - 综合案例展示</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -205,6 +205,38 @@
         .tag.html { background-color: #d3f9d8; color: #2b8a3e; }
         .tag.php { background-color: #e5dbff; color: #5f3dc4; }
         .tag.python { background-color: #ffec99; color: #e67700; }
+        .tag.机器人 { background-color: #d0ebff; color: #1971c2; }
+        .tag.导航 { background-color: #e7f5ff; color: #1971c2; }
+        .tag.ros { background-color: #ffe8cc; color: #e8590c; }
+        .tag.视觉 { background-color: #d3f9d8; color: #2b8a3e; }
+        .tag.opencv { background-color: #ffc9c9; color: #c92a2a; }
+        .tag.linux { background-color: #ffd8a8; color: #e8590c; }
+        .tag.算法 { background-color: #dbe4ff; color: #364fc7; }
+        .tag.材料科学 { background-color: #e5dbff; color: #5f3dc4; }
+        .tag.疲劳数据 { background-color: #ffc9c9; color: #c92a2a; }
+        .tag.机器学习 { background-color: #d0ebff; color: #1971c2; }
+        .tag.预测模型 { background-color: #d3f9d8; color: #2b8a3e; }
+        .tag.化学材料 { background-color: #fff3bf; color: #e67700; }
+        .tag.电池 { background-color: #dbe4ff; color: #364fc7; }
+        .tag.电化学 { background-color: #ffd8a8; color: #e8590c; }
+        .tag.材料研究 { background-color: #d0ebff; color: #1971c2; }
+        .tag.仿生算法 { background-color: #e5dbff; color: #5f3dc4; }
+        .tag.优化问题 { background-color: #d3f9d8; color: #2b8a3e; }
+        .tag.遗传算法 { background-color: #ffc9c9; color: #c92a2a; }
+        .tag.人工智能 { background-color: #dbe4ff; color: #364fc7; }
+        .tag.布局 { background-color: #ffd8a8; color: #e8590c; }
+        .tag.响应式 { background-color: #d0ebff; color: #1971c2; }
+        .tag.异步 { background-color: #dbe4ff; color: #364fc7; }
+        .tag.promise { background-color: #ffc9c9; color: #c92a2a; }
+        .tag.语义化 { background-color: #d3f9d8; color: #2b8a3e; }
+        .tag.seo { background-color: #e5dbff; color: #5f3dc4; }
+        .tag.api { background-color: #fff3bf; color: #e67700; }
+        .tag.restful { background-color: #ffc9c9; color: #c92a2a; }
+        .tag.数据分析 { background-color: #d0ebff; color: #1971c2; }
+        .tag.pandas { background-color: #ffd8a8; color: #e8590c; }
+        .tag.性能 { background-color: #d3f9d8; color: #2b8a3e; }
+        .tag.优化 { background-color: #dbe4ff; color: #364fc7; }
+        .tag.cplusplus { background-color: #e5dbff; color: #5f3dc4; }
         
         .card-footer {
             padding: 15px 20px;
@@ -353,6 +385,45 @@
             color: #666;
             font-size: 0.9rem;
         }
+        
+        .filter-menu {
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            padding: 20px;
+            z-index: 100;
+            width: 250px;
+        }
+        
+        .stats-bar {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 10px 15px;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -363,7 +434,7 @@
                     <i class="fas fa-history"></i>
                     <div>
                         <h1>历史记录<span>分析系统</span></h1>
-                        <p class="subtitle">动态卡片式记录与案例暗示分析</p>
+                        <p class="subtitle">12个综合案例展示 - 技术、机器人、材料科学</p>
                     </div>
                 </div>
                 <div class="controls">
@@ -381,6 +452,25 @@
     </header>
     
     <div class="container">
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number" id="totalCount">12</div>
+                <div class="stat-label">总案例数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="completeCount">8</div>
+                <div class="stat-label">已完成</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="progressCount">3</div>
+                <div class="stat-label">进行中</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="pendingCount">1</div>
+                <div class="stat-label">待处理</div>
+            </div>
+        </div>
+        
         <main>
             <div id="cardsContainer" class="main-content">
                 <!-- 动态卡片将通过JavaScript生成 -->
@@ -442,12 +532,12 @@
         </main>
         
         <footer>
-            <p>历史记录分析系统 &copy; 2023 | 点击卡片查看详细案例暗示分析</p>
+            <p>历史记录分析系统 &copy; 2023 | 综合案例展示 - 点击卡片查看详细分析</p>
         </footer>
     </div>
 
     <script>
-        // 模拟数据 - 在实际使用中，这些数据可以来自外部JSON文件或API
+        // 完整的12个案例记录
         const records = [
             {
                 id: "REC001",
@@ -502,73 +592,75 @@
                 tags: ["javascript", "性能", "优化"],
                 status: "complete",
                 link: "case-analysis-006.html"
+            },
+            {
+                id: "REC007",
+                title: "机器人导航与路径规划",
+                description: "深入分析移动机器人导航系统的关键技术，包括环境感知、定位和路径规划算法。",
+                date: "2023-11-15",
+                tags: ["机器人", "导航", "ROS", "算法"],
+                status: "complete",
+                link: "case-analysis-007.html"
+            },
+            {
+                id: "REC008",
+                title: "机器人视觉处理与OpenCV",
+                description: "探讨机器人视觉系统的构建，使用OpenCV进行图像处理、目标检测和跟踪的实践方法。",
+                date: "2023-11-18",
+                tags: ["机器人", "视觉", "OpenCV", "Python"],
+                status: "complete",
+                link: "case-analysis-008.html"
+            },
+            {
+                id: "REC009",
+                title: "ROS机器人操作系统实战",
+                description: "全面介绍ROS核心概念和实际应用，包括节点、话题、服务等关键组件的实战演练。",
+                date: "2023-11-20",
+                tags: ["机器人", "ROS", "Linux", "C++", "Python"],
+                status: "progress",
+                link: "case-analysis-009.html"
+            },
+            {
+                id: "REC010",
+                title: "材料疲劳数据分析与预测",
+                description: "通过数据分析和机器学习方法，预测材料在不同应力条件下的疲劳寿命，为工程设计提供依据。",
+                date: "2023-11-25",
+                tags: ["材料科学", "疲劳数据", "机器学习", "预测模型"],
+                status: "complete",
+                link: "case-analysis-010.html"
+            },
+            {
+                id: "REC011",
+                title: "化学电池材料研究与性能优化",
+                description: "研究新型化学电池材料，通过实验和模拟优化电池性能，提高能量密度和循环寿命。",
+                date: "2023-11-28",
+                tags: ["化学材料", "电池", "电化学", "材料研究"],
+                status: "progress",
+                link: "case-analysis-011.html"
+            },
+            {
+                id: "REC012",
+                title: "仿生算法在优化问题中的应用",
+                description: "研究仿生算法（如遗传算法、蚁群算法、粒子群算法）在复杂优化问题中的应用，提高求解效率。",
+                date: "2023-12-01",
+                tags: ["仿生算法", "优化问题", "遗传算法", "人工智能"],
+                status: "complete",
+                link: "case-analysis-012.html"
             }
         ];
-        // 在现有的records数组中添加以下三个新记录
-const records = [
-    
-    
-    // 新添加的三个机器人项目案例
-    {
-        id: "REC007",
-        title: "机器人导航与路径规划",
-        description: "深入分析移动机器人导航系统的关键技术，包括环境感知、定位和路径规划算法。",
-        date: "2023-11-15",
-        tags: ["机器人", "导航", "ROS", "算法"],
-        status: "complete",
-        link: "case-analysis-007.html"
-    },
-    {
-        id: "REC008",
-        title: "机器人视觉处理与OpenCV",
-        description: "探讨机器人视觉系统的构建，使用OpenCV进行图像处理、目标检测和跟踪的实践方法。",
-        date: "2023-11-18",
-        tags: ["机器人", "视觉", "OpenCV", "Python"],
-        status: "complete",
-        link: "case-analysis-008.html"
-    },
-    {
-        id: "REC009",
-        title: "ROS机器人操作系统实战",
-        description: "全面介绍ROS核心概念和实际应用，包括节点、话题、服务等关键组件的实战演练。",
-        date: "2023-11-20",
-        tags: ["机器人", "ROS", "Linux", "C++", "Python"],
-        status: "progress",
-        link: "case-analysis-009.html"
-    }
-];
-        // 在现有的records数组中添加以下三个新记录（接在之前的9个案例之后）
-const records = [
-    
-    // 新添加的三个生物化学与材料科学案例
-    {
-        id: "REC010",
-        title: "材料疲劳数据分析与预测",
-        description: "通过数据分析和机器学习方法，预测材料在不同应力条件下的疲劳寿命，为工程设计提供依据。",
-        date: "2023-11-25",
-        tags: ["材料科学", "疲劳数据", "机器学习", "预测模型"],
-        status: "complete",
-        link: "case-analysis-010.html"
-    },
-    {
-        id: "REC011",
-        title: "化学电池材料研究与性能优化",
-        description: "研究新型化学电池材料，通过实验和模拟优化电池性能，提高能量密度和循环寿命。",
-        date: "2023-11-28",
-        tags: ["化学材料", "电池", "电化学", "材料研究"],
-        status: "progress",
-        link: "case-analysis-011.html"
-    },
-    {
-        id: "REC012",
-        title: "仿生算法在优化问题中的应用",
-        description: "研究仿生算法（如遗传算法、蚁群算法、粒子群算法）在复杂优化问题中的应用，提高求解效率。",
-        date: "2023-12-01",
-        tags: ["仿生算法", "优化问题", "遗传算法", "人工智能"],
-        status: "complete",
-        link: "case-analysis-012.html"
-    }
-];
+
+        // 更新统计信息
+        function updateStats(filteredRecords = records) {
+            const total = filteredRecords.length;
+            const complete = filteredRecords.filter(r => r.status === "complete").length;
+            const progress = filteredRecords.filter(r => r.status === "progress").length;
+            const pending = filteredRecords.filter(r => r.status === "pending").length;
+            
+            document.getElementById("totalCount").textContent = total;
+            document.getElementById("completeCount").textContent = complete;
+            document.getElementById("progressCount").textContent = progress;
+            document.getElementById("pendingCount").textContent = pending;
+        }
 
         // 渲染卡片函数
         function renderCards(filteredRecords = records) {
@@ -581,6 +673,7 @@ const records = [
             // 如果没有记录，显示空状态
             if (filteredRecords.length === 0) {
                 emptyState.style.display = 'block';
+                updateStats(filteredRecords);
                 return;
             }
             
@@ -617,11 +710,15 @@ const records = [
                         <h3 class="card-title">${record.title}</h3>
                         <p class="card-desc">${record.description}</p>
                         <div class="card-tags">
-                            ${record.tags.map(tag => `<span class="tag ${tag}">${tag}</span>`).join('')}
+                            ${record.tags.map(tag => {
+                                // 处理特殊标签的CSS类名
+                                const tagClass = tag.toLowerCase().replace(/\+/g, 'plus');
+                                return `<span class="tag ${tagClass}">${tag}</span>`;
+                            }).join('')}
                         </div>
                     </div>
                     <div class="card-footer">
-                        <a href="${record.link}" class="card-link">
+                        <a href="${record.link}" class="card-link" onclick="event.stopPropagation()">
                             <i class="fas fa-external-link-alt"></i>
                             查看详细分析
                         </a>
@@ -631,6 +728,9 @@ const records = [
                 
                 container.appendChild(card);
             });
+            
+            // 更新统计信息
+            updateStats(filteredRecords);
         }
 
         // 搜索功能
@@ -661,32 +761,24 @@ const records = [
         function setupFilter() {
             const filterBtn = document.getElementById('filterBtn');
             let filterVisible = false;
+            let filterMenu = null;
             
-            filterBtn.addEventListener('click', function() {
-                if (filterVisible) {
-                    removeFilterMenu();
+            filterBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                if (filterVisible && filterMenu) {
+                    filterMenu.remove();
                     filterVisible = false;
+                    filterMenu = null;
                     return;
                 }
                 
                 // 创建筛选菜单
-                const filterMenu = document.createElement('div');
+                filterMenu = document.createElement('div');
                 filterMenu.className = 'filter-menu';
-                filterMenu.style.cssText = `
-                    position: absolute;
-                    background: white;
-                    border-radius: 8px;
-                    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-                    padding: 20px;
-                    z-index: 100;
-                    width: 250px;
-                    margin-top: 10px;
-                `;
                 
-                // 获取按钮位置
-                const btnRect = filterBtn.getBoundingClientRect();
-                filterMenu.style.left = `${btnRect.left}px`;
-                filterMenu.style.top = `${btnRect.bottom}px`;
+                // 获取所有不重复的标签
+                const allTags = [...new Set(records.flatMap(r => r.tags))];
                 
                 filterMenu.innerHTML = `
                     <h3 style="margin-bottom: 15px; color: #2c3e50;">筛选记录</h3>
@@ -707,38 +799,49 @@ const records = [
                     </div>
                     <div>
                         <p style="font-weight: 600; margin-bottom: 8px; color: #495057;">按标签筛选</p>
-                        <div class="tag-filters" style="display: flex; flex-wrap: wrap; gap: 8px;">
-                            ${Array.from(new Set(records.flatMap(r => r.tags))).map(tag => 
-                                `<label style="display: flex; align-items: center; cursor: pointer;">
+                        <div class="tag-filters" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 200px; overflow-y: auto; padding: 5px;">
+                            ${allTags.map(tag => 
+                                `<label style="display: flex; align-items: center; cursor: pointer; margin-right: 10px;">
                                     <input type="checkbox" class="tag-filter" value="${tag}" checked style="margin-right: 5px;">
                                     <span class="tag ${tag}">${tag}</span>
                                 </label>`
                             ).join('')}
                         </div>
                     </div>
-                    <button id="applyFilter" style="background-color: #4dabf7; color: white; border: none; padding: 10px 20px; border-radius: 6px; margin-top: 20px; width: 100%; cursor: pointer;">应用筛选</button>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button id="applyFilter" style="background-color: #4dabf7; color: white; border: none; padding: 10px 20px; border-radius: 6px; flex: 1; cursor: pointer;">应用筛选</button>
+                        <button id="resetFilter" style="background-color: #e9ecef; color: #495057; border: none; padding: 10px 20px; border-radius: 6px; flex: 1; cursor: pointer;">重置</button>
+                    </div>
                 `;
                 
                 document.body.appendChild(filterMenu);
+                
+                // 定位筛选菜单
+                const btnRect = filterBtn.getBoundingClientRect();
+                filterMenu.style.position = 'absolute';
+                filterMenu.style.left = `${btnRect.left}px`;
+                filterMenu.style.top = `${btnRect.bottom + window.scrollY + 5}px`;
+                
                 filterVisible = true;
                 
                 // 应用筛选按钮事件
                 document.getElementById('applyFilter').addEventListener('click', applyFilters);
                 
+                // 重置筛选按钮事件
+                document.getElementById('resetFilter').addEventListener('click', resetFilters);
+                
                 // 点击外部关闭筛选菜单
-                document.addEventListener('click', function closeFilter(e) {
-                    if (!filterMenu.contains(e.target) && e.target !== filterBtn) {
-                        removeFilterMenu();
-                        filterVisible = false;
-                        document.removeEventListener('click', closeFilter);
-                    }
-                });
+                setTimeout(() => {
+                    document.addEventListener('click', closeFilter);
+                }, 10);
             });
             
-            function removeFilterMenu() {
-                const existingMenu = document.querySelector('.filter-menu');
-                if (existingMenu) {
-                    existingMenu.remove();
+            function closeFilter(e) {
+                if (filterMenu && !filterMenu.contains(e.target) && e.target !== filterBtn) {
+                    filterMenu.remove();
+                    filterVisible = false;
+                    filterMenu = null;
+                    document.removeEventListener('click', closeFilter);
                 }
             }
             
@@ -764,8 +867,22 @@ const records = [
                 });
                 
                 renderCards(filtered);
-                removeFilterMenu();
-                filterVisible = false;
+                
+                if (filterMenu) {
+                    filterMenu.remove();
+                    filterVisible = false;
+                    filterMenu = null;
+                    document.removeEventListener('click', closeFilter);
+                }
+            }
+            
+            function resetFilters() {
+                // 重置所有复选框为选中状态
+                document.querySelectorAll('.status-filter').forEach(cb => cb.checked = true);
+                document.querySelectorAll('.tag-filter').forEach(cb => cb.checked = true);
+                
+                // 渲染所有记录
+                renderCards();
             }
         }
 
