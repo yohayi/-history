@@ -1,0 +1,218 @@
+<!-- case-analysis-012.html 文件结构类似，内容聚焦仿生算法 -->
+<!-- 完整代码结构请参考010，以下为关键差异部分 -->
+
+<div class="case-header">
+    <span class="case-id">REC012</span>
+    <h1 class="case-title">仿生算法在优化问题中的应用</h1>
+    <div class="case-meta">
+        <div class="case-meta-item">
+            <i class="far fa-calendar"></i>
+            <span>创建日期: 2023-12-01</span>
+        </div>
+        <!-- 其他元数据 -->
+    </div>
+    <div class="case-tags">
+        <span class="tag bionic">仿生算法</span>
+        <span class="tag optimization">优化</span>
+        <span class="tag algorithm">算法</span>
+        <span class="tag ai">人工智能</span>
+        <span class="tag">遗传算法</span>
+        <span class="tag">粒子群</span>
+    </div>
+</div>
+
+<div class="content-section">
+    <div class="hint-box">
+        <div class="hint-title">
+            <i class="fas fa-dna"></i>
+            <h3>案例暗示分析</h3>
+        </div>
+        <p>这个案例探讨了受自然界启发的仿生优化算法，包括遗传算法、粒子群优化、蚁群算法等。这些算法在解决复杂工程优化问题时表现出色，特别是在传统方法难以处理的非线性、多峰值问题中。</p>
+    </div>
+    
+    <h2 class="section-title">主要仿生优化算法</h2>
+    
+    <div class="material-grid">
+        <div class="material-card">
+            <h4><i class="fas fa-dna"></i> 遗传算法 (GA)</h4>
+            <p>模拟自然选择和遗传机制，通过选择、交叉、变异操作在解空间中搜索最优解。</p>
+        </div>
+        
+        <div class="material-card">
+            <h4><i class="fas fa-dove"></i> 粒子群优化 (PSO)</h4>
+            <p>模拟鸟群或鱼群的群体行为，粒子根据个体经验和群体经验调整位置，寻找最优解。</p>
+        </div>
+        
+        <div class="material-card">
+            <h4><i class="fas fa-bug"></i> 蚁群算法 (ACO)</h4>
+            <p>模拟蚂蚁寻找食物的路径选择行为，通过信息素的正反馈机制寻找最优路径。</p>
+        </div>
+        
+        <div class="material-card">
+            <h4><i class="fas fa-brain"></i> 神经网络优化</h4>
+            <p>模拟大脑神经网络结构，通过反向传播等算法优化网络权重，解决复杂模式识别问题。</p>
+        </div>
+    </div>
+</div>
+
+<div class="content-section">
+    <h2 class="section-title">仿生算法性能对比</h2>
+    
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>算法</th>
+                <th>灵感来源</th>
+                <th>优点</th>
+                <th>缺点</th>
+                <th>适用问题</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>遗传算法</strong></td>
+                <td>生物进化</td>
+                <td>全局搜索能力强，并行性好</td>
+                <td>收敛速度慢，参数敏感</td>
+                <td>组合优化，函数优化</td>
+            </tr>
+            <tr>
+                <td><strong>粒子群优化</strong></td>
+                <td>鸟群觅食</td>
+                <td>实现简单，收敛速度快</td>
+                <td>易陷入局部最优</td>
+                <td>连续函数优化</td>
+            </tr>
+            <tr>
+                <td><strong>蚁群算法</strong></td>
+                <td>蚂蚁觅食</td>
+                <td>正反馈机制，鲁棒性好</td>
+                <td>计算量大，收敛慢</td>
+                <td>路径规划，调度问题</td>
+            </tr>
+            <tr>
+                <td><strong>模拟退火</strong></td>
+                <td>金属退火</td>
+                <td>避免局部最优，理论保证</td>
+                <td>收敛速度慢，参数敏感</td>
+                <td>组合优化，NP难问题</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="content-section">
+    <h2 class="section-title">遗传算法Python实现示例</h2>
+    
+    <div class="code-block">
+<span class="code-comment"># 遗传算法解决函数优化问题</span><br>
+<span class="code-keyword">import</span> numpy <span class="code-keyword">as</span> np<br>
+<span class="code-keyword">import</span> matplotlib.pyplot <span class="code-keyword">as</span> plt<br>
+<span class="code-keyword">from</span> matplotlib.animation <span class="code-keyword">import</span> FuncAnimation<br><br>
+
+<span class="code-keyword">class</span> <span class="code-function">GeneticAlgorithm</span>:<br>
+&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, population_size, chromosome_length, mutation_rate, crossover_rate):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.pop_size = population_size<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.chrom_len = chromosome_length<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.mutation_rate = mutation_rate<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.crossover_rate = crossover_rate<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.population = self.<span class="code-function">initialize_population</span>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.best_fitness_history = []<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.avg_fitness_history = []<br><br>
+&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">initialize_population</span>(self):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 随机初始化种群</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> np.random.randint(2, size=(self.pop_size, self.chrom_len))<br><br>
+&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">fitness_function</span>(self, chromosome):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 目标函数：最大化 f(x) = x^2，x ∈ [0, 1023]</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 将二进制染色体解码为十进制数</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;x = self.<span class="code-function">decode_chromosome</span>(chromosome)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> x ** 2<br><br>
+&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">decode_chromosome</span>(self, chromosome):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 二进制转十进制</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;decimal = 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> i, gene <span class="code-keyword">in</span> <span class="code-function">enumerate</span>(chromosome[::-1]):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;decimal += gene * (2 ** i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> decimal<br><br>
+&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">selection</span>(self, fitness_values):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 轮盘赌选择</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;probabilities = fitness_values / np.<span class="code-function">sum</span>(fitness_values)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;selected_indices = np.random.choice(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.pop_size, size=self.pop_size, p=probabilities<br>
+&nbsp;&nbsp;&nbsp;&nbsp;)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> self.population[selected_indices]<br><br>
+&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">crossover</span>(self, parent1, parent2):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 单点交叉</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> np.random.rand() &lt; self.crossover_rate:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;crossover_point = np.random.randint(1, self.chrom_len - 1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;child1 = np.concatenate([parent1[:crossover_point], parent2[crossover_point:]])<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;child2 = np.concatenate([parent2[:crossover_point], parent1[crossover_point:]])<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> child1, child2<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> parent1.copy(), parent2.copy()<br><br>
+&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">mutation</span>(self, chromosome):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 位翻转变异</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-function">range</span>(self.chrom_len):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> np.random.rand() &lt; self.mutation_rate:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;chromosome[i] = 1 - chromosome[i]  <span class="code-comment"># 翻转位</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> chromosome<br><br>
+&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">run_generation</span>(self):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 计算适应度</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;fitness_values = np.array([self.<span class="code-function">fitness_function</span>(chrom) <span class="code-keyword">for</span> chrom <span class="code-keyword">in</span> self.population])<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 记录历史数据</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.best_fitness_history.<span class="code-function">append</span>(np.<span class="code-function">max</span>(fitness_values))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.avg_fitness_history.<span class="code-function">append</span>(np.<span class="code-function">mean</span>(fitness_values))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 选择</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;selected = self.<span class="code-function">selection</span>(fitness_values)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 交叉和变异</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;new_population = []<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-function">range</span>(0, self.pop_size, 2):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parent1, parent2 = selected[i], selected[i+1]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;child1, child2 = self.<span class="code-function">crossover</span>(parent1, parent2)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;child1 = self.<span class="code-function">mutation</span>(child1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;child2 = self.<span class="code-function">mutation</span>(child2)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new_population.<span class="code-function">extend</span>([child1, child2])<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.population = np.array(new_population)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 返回最佳个体</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;best_idx = np.<span class="code-function">argmax</span>(fitness_values)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> self.population[best_idx], fitness_values[best_idx]<br><br>
+&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">run</span>(self, generations):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> gen <span class="code-keyword">in</span> <span class="code-function">range</span>(generations):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;best_chrom, best_fitness = self.<span class="code-function">run_generation</span>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> gen % 10 == 0:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;best_x = self.<span class="code-function">decode_chromosome</span>(best_chrom)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-function">print</span>(<span class="code-string">f"Generation <span class="code-variable">{gen}</span>: Best x = <span class="code-variable">{best_x}</span>, f(x) = <span class="code-variable">{best_fitness:.2f}</span>"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 绘制收敛曲线</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.figure(figsize=(10, 6))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.plot(self.best_fitness_history, label=<span class="code-string">'最佳适应度'</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.plot(self.avg_fitness_history, label=<span class="code-string">'平均适应度'</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.xlabel(<span class="code-string">'进化代数'</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.ylabel(<span class="code-string">'适应度'</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.title(<span class="code-string">'遗传算法收敛曲线'</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.legend()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.grid(True)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;plt.show()<br><br>
+
+<span class="code-comment"># 运行遗传算法</span><br>
+<span class="code-keyword">if</span> __name__ == <span class="code-string">"__main__"</span>:<br>
+&nbsp;&nbsp;ga = <span class="code-function">GeneticAlgorithm</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;population_size=50,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;chromosome_length=10,  <span class="code-comment"># 可表示0-1023</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;mutation_rate=0.01,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;crossover_rate=0.8<br>
+&nbsp;&nbsp;)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;best_solution, best_fitness = ga.<span class="code-function">run</span>(generations=100)<br>
+&nbsp;&nbsp;best_x = ga.<span class="code-function">decode_chromosome</span>(best_solution)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(<span class="code-string">f"\n最终结果: x = <span class="code-variable">{best_x}</span>, f(x) = <span class="code-variable">{best_fitness}</span>"</span>)<br>
+&nbsp;&nbsp;<span class="code-function">print</span>(<span class="code-string">f"理论最大值: x = 1023, f(x) = <span class="code-number">1046529</span>"</span>)<br>
+    </div>
+</div>
+
+<!-- 更多内容：粒子群优化、蚁群算法、实际工程应用案例等 -->
