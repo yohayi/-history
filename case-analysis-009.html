@@ -1,0 +1,118 @@
+<!-- case-analysis-009.html 文件结构类似，内容聚焦ROS -->
+<!-- 完整代码结构请参考007，以下为关键差异部分 -->
+
+<div class="case-header">
+    <span class="case-id">REC009</span>
+    <h1 class="case-title">ROS机器人操作系统实战</h1>
+    <div class="case-meta">
+        <div class="case-meta-item">
+            <i class="far fa-calendar"></i>
+            <span>创建日期: 2023-11-20</span>
+        </div>
+        <!-- 其他元数据 -->
+    </div>
+    <div class="case-tags">
+        <span class="tag robot">机器人</span>
+        <span class="tag ros">ROS</span>
+        <span class="tag linux">Linux</span>
+        <span class="tag cpp">C++</span>
+        <span class="tag python">Python</span>
+        <span class="tag">分布式系统</span>
+    </div>
+</div>
+
+<div class="content-section">
+    <div class="hint-box">
+        <div class="hint-title">
+            <i class="fas fa-cogs"></i>
+            <h3>案例暗示分析</h3>
+        </div>
+        <p>这个案例全面介绍ROS(Robot Operating System)的核心概念和实际应用，包括节点、话题、服务、参数服务器等关键组件。通过实际项目演示，展示如何构建模块化、可复用的机器人软件系统。</p>
+    </div>
+    
+    <h2 class="section-title">ROS核心架构</h2>
+    
+    <div class="visualization">
+        <div class="viz-item">
+            <div class="viz-title">节点(Node)</div>
+            <p>ROS中的基本执行单元，每个节点负责完成特定的功能。</p>
+        </div>
+        
+        <div class="viz-item">
+            <div class="viz-title">话题(Topic)</div>
+            <p>节点间通信的异步消息传递机制，使用发布/订阅模式。</p>
+        </div>
+        
+        <div class="viz-item">
+            <div class="viz-title">服务(Service)</div>
+            <p>节点间通信的同步请求/响应机制，用于执行一次性操作。</p>
+        </div>
+        
+        <div class="viz-item">
+            <div class="viz-title">动作(Action)</div>
+            <p>长时运行任务的通信机制，支持目标、反馈和结果。</p>
+        </div>
+    </div>
+</div>
+
+<div class="content-section">
+    <h2 class="section-title">ROS节点通信示例</h2>
+    
+    <div class="code-block">
+<span class="code-comment"># ROS Python节点示例 - 发布者节点</span><br>
+<span class="code-keyword">#!/usr/bin/env python3</span><br>
+<span class="code-keyword">import</span> rospy<br>
+<span class="code-keyword">from</span> std_msgs.msg <span class="code-keyword">import</span> String<br><br>
+
+<span class="code-keyword">def</span> <span class="code-function">talker</span>():<br>
+&nbsp;&nbsp;<span class="code-comment"># 初始化ROS节点</span><br>
+&nbsp;&nbsp;rospy.init_node(<span class="code-string">'talker'</span>, anonymous=True)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 创建发布者</span><br>
+&nbsp;&nbsp;pub = rospy.Publisher(<span class="code-string">'chatter'</span>, String, queue_size=10)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 设置发布频率</span><br>
+&nbsp;&nbsp;rate = rospy.Rate(10)  <span class="code-comment"># 10Hz</span><br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-keyword">while</span> <span class="code-keyword">not</span> rospy.is_shutdown():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 创建消息</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;hello_str = <span class="code-string">"Hello ROS! Time: %s"</span> % rospy.get_time()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rospy.loginfo(hello_str)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 发布消息</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;pub.publish(hello_str)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># 等待下一个周期</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;rate.sleep()<br><br>
+
+<span class="code-keyword">if</span> __name__ == <span class="code-string">'__main__'</span>:<br>
+&nbsp;&nbsp;<span class="code-keyword">try</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-function">talker</span>()<br>
+&nbsp;&nbsp;<span class="code-keyword">except</span> rospy.ROSInterruptException:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;pass<br><br>
+
+<span class="code-comment"># ROS Python节点示例 - 订阅者节点</span><br>
+<span class="code-keyword">#!/usr/bin/env python3</span><br>
+<span class="code-keyword">import</span> rospy<br>
+<span class="code-keyword">from</span> std_msgs.msg <span class="code-keyword">import</span> String<br><br>
+
+<span class="code-keyword">def</span> <span class="code-function">callback</span>(data):<br>
+&nbsp;&nbsp;<span class="code-comment"># 收到消息时的回调函数</span><br>
+&nbsp;&nbsp;rospy.loginfo(<span class="code-string">"收到消息: %s"</span> % data.data)<br><br>
+
+<span class="code-keyword">def</span> <span class="code-function">listener</span>():<br>
+&nbsp;&nbsp;<span class="code-comment"># 初始化ROS节点</span><br>
+&nbsp;&nbsp;rospy.init_node(<span class="code-string">'listener'</span>, anonymous=True)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 创建订阅者</span><br>
+&nbsp;&nbsp;rospy.Subscriber(<span class="code-string">"chatter"</span>, String, callback)<br>
+&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="code-comment"># 保持节点运行</span><br>
+&nbsp;&nbsp;rospy.spin()<br><br>
+
+<span class="code-keyword">if</span> __name__ == <span class="code-string">'__main__'</span>:<br>
+&nbsp;&nbsp;<span class="code-function">listener</span>()<br>
+    </div>
+</div>
+
+<!-- 更多内容：ROS包管理、launch文件、rviz可视化、TF坐标变换等 -->
